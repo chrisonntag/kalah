@@ -1,6 +1,7 @@
 package kalah.model;
 
 import kalah.model.players.Player;
+import kalah.exceptions.IllegalMoveException;
 
 /**
  * Interface for the Mancala game Kalah. We call the pods/houses of the players
