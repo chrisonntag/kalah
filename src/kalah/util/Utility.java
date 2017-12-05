@@ -11,12 +11,12 @@ public class Utility {
   public static final String HUMAN_MISS = "You must miss a turn.";
 
   public static final String WIN = "Congratulations! You won with %d seeds "
-      + "versus %d seeds of the machine.";
+      + "versus %d seeds of the machine.%n";
 
   public static final String LOOSE = "Sorry! Machine wins with %d seeds "
-      + "versus your %d.";
+      + "versus your %d.%n";
 
   public static final String STALEMATE = "Nobody wins. Tie with %d seeds "
-      + "for each player.";
+      + "for each player.%n";
 
 }
