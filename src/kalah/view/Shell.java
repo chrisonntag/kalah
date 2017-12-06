@@ -10,6 +10,7 @@ import kalah.model.Board;
 import kalah.model.BoardImpl;
 import kalah.model.players.Player;
 import kalah.util.Utility;
+import org.omg.CORBA.PUBLIC_MEMBER;
 
 /**
  * The Shell class represents a basic command line user interface, providing
@@ -21,6 +22,8 @@ public final class Shell {
   private static int level = 3;
   private static int PITS_PER_PLAYER = 6;
   private static int SEEDS_PER_PIT = 4;
+  private static Player FIRST_PLAYER = Player.HUMAN;
+  private static Player SECOND_PLAYER = Player.MACHINE;
 
   private Shell() { }
 
@@ -82,7 +85,8 @@ public final class Shell {
         PITS_PER_PLAYER = args.get("pits");
         SEEDS_PER_PIT = args.get("seeds");
 
-        newGame(Player.HUMAN, Player.MACHINE, PITS_PER_PLAYER, SEEDS_PER_PIT);
+        game = new BoardImpl(FIRST_PLAYER, SECOND_PLAYER,
+            PITS_PER_PLAYER, SEEDS_PER_PIT);
         break;
       case 'L':
         if (game != null) {
@@ -112,13 +116,12 @@ public final class Shell {
         break;
       case 'S':
         if (game != null) {
-          if (game.getWinner() == Player.HUMAN) {
-            newGame(Player.MACHINE, Player.HUMAN,
-                PITS_PER_PLAYER, SEEDS_PER_PIT);
-          } else {
-            newGame(Player.HUMAN, Player.MACHINE,
-                PITS_PER_PLAYER, SEEDS_PER_PIT);
-          }
+          Player temp = FIRST_PLAYER;
+          FIRST_PLAYER = SECOND_PLAYER;
+          SECOND_PLAYER = temp;
+
+          game = new BoardImpl(FIRST_PLAYER, SECOND_PLAYER,
+              PITS_PER_PLAYER, SEEDS_PER_PIT);
         } else {
           System.out.println("Error! No game started yet.");
         }
@@ -231,11 +234,6 @@ public final class Shell {
     }
 
     return params;
-  }
-
-  private static void newGame(Player humanPlayer, Player machinePlayer,
-      int pits, int seeds) {
-    game = new BoardImpl(humanPlayer, machinePlayer, pits, seeds);
   }
 
   private static boolean isValid(int[] values) {
