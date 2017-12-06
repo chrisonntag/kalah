@@ -17,8 +17,10 @@ import kalah.util.Utility;
  */
 public final class Shell {
 
-  private static Board game;
+  private static Board game = null;
   private static int level = 3;
+  private static int PITS_PER_PLAYER = 6;
+  private static int SEEDS_PER_PIT = 4;
 
   private Shell() { }
 
@@ -37,10 +39,6 @@ public final class Shell {
 
   private static void execute(BufferedReader reader) throws IOException {
     boolean quit = false;
-
-    // Start a new game, so users can immediately start to play.
-    newGame(Player.HUMAN, Player.MACHINE,
-        Utility.PITS_PER_PLAYER, Utility.SEEDS_PER_PIT);
 
     while (!quit) {
       System.out.print("kalah> ");
@@ -81,38 +79,56 @@ public final class Shell {
 
     switch (Character.toUpperCase(command.toCharArray()[0])) {
       case 'N':
-        newGame(Player.HUMAN, Player.MACHINE,
-            Utility.PITS_PER_PLAYER, Utility.SEEDS_PER_PIT);
+        PITS_PER_PLAYER = args.get("pits");
+        SEEDS_PER_PIT = args.get("seeds");
+
+        newGame(Player.HUMAN, Player.MACHINE, PITS_PER_PLAYER, SEEDS_PER_PIT);
         break;
       case 'L':
-        game.setLevel(args.get("level"));
+        if (game != null) {
+          game.setLevel(args.get("level"));
+        } else {
+          System.out.println("Error! No game started yet.");
+        }
         break;
       case 'M':
-        try {
-          game = game.move(args.get("pit"));
-        } catch (IllegalMoveException | IllegalArgumentException e) {
-          System.out.printf(e.getMessage());
-        }
+        if (game != null) {
+          try {
+            game = game.move(args.get("pit"));
+          } catch (IllegalMoveException | IllegalArgumentException e) {
+            System.out.printf(e.getMessage());
+          }
 
-        if (game.isGameOver()) {
-          getWinner();
-        } else if (game.next() == Player.MACHINE) {
-          machineMove();
+          if (game.isGameOver()) {
+            getWinner();
+          } else if (game.next() == Player.MACHINE) {
+            machineMove();
+          } else {
+            System.out.println(Utility.MACHINE_MISS);
+          }
         } else {
-          System.out.println(Utility.MACHINE_MISS);
+          System.out.println("Error! No game started yet.");
         }
         break;
       case 'S':
-        if (game.getWinner() == Player.HUMAN) {
-          newGame(Player.MACHINE, Player.HUMAN,
-              Utility.PITS_PER_PLAYER, Utility.SEEDS_PER_PIT);
+        if (game != null) {
+          if (game.getWinner() == Player.HUMAN) {
+            newGame(Player.MACHINE, Player.HUMAN,
+                PITS_PER_PLAYER, SEEDS_PER_PIT);
+          } else {
+            newGame(Player.HUMAN, Player.MACHINE,
+                PITS_PER_PLAYER, SEEDS_PER_PIT);
+          }
         } else {
-          newGame(Player.HUMAN, Player.MACHINE,
-              Utility.PITS_PER_PLAYER, Utility.SEEDS_PER_PIT);
+          System.out.println("Error! No game started yet.");
         }
         break;
       case 'P':
-        renderGame();
+        if (game != null) {
+          System.out.println(game);
+        } else {
+          System.out.println("Error! No game started yet.");
+        }
         break;
       case 'H':
         showHelp();
@@ -143,32 +159,48 @@ public final class Shell {
     params.put("error", 0);
 
     switch (Character.toUpperCase(command.toCharArray()[0])) {
-      case 'M':
-        if (args.length == 5) {
-          int[] values = new int[args.length - 1];
+      case 'N':
+        if (args.length == 3) {
+          int pits = 0, seeds = 0;
 
           try {
-            for (int i = 1; i < args.length; i++) {
-              values[i - 1] = Integer.parseInt(args[i]);
-            }
+            pits = Integer.parseInt(args[1]);
+            seeds = Integer.parseInt(args[2]);
+          } catch (NumberFormatException nfe) {
+            System.out.println("Error! All arguments must "
+                + "be numbers.");
+            break;
+          }
+
+          params.put("pits", pits);
+          params.put("seeds", seeds);
+        } else {
+          System.out.println("Error! Wrong number of arguments: "
+              + "+2 integers expected.");
+          params.put("error", 1);
+        }
+        break;
+      case 'M':
+        if (args.length == 2) {
+          int pit = 0;
+
+          try {
+            pit = Integer.parseInt(args[1]);
           } catch (NumberFormatException nfe) {
             System.out.println("Error! All arguments must "
                 + "be numbers.");
           }
 
-          if (isValid(values)) {
-            params.put("colFrom", values[0]);
-            params.put("rowFrom", values[1]);
-            params.put("colTo", values[2]);
-            params.put("rowTo", values[3]);
+          if (pit > 0) {
+            params.put("pit", pit);
           } else {
-            System.out.println("Error! All parameters must "
+            System.out.println("Error! Parameter must "
                 + "be positive and not zero.");
             params.put("error", 1);
           }
         } else {
           System.out.println("Error! Wrong number of arguments: "
-              + "+4 integers expected.");
+              + "+1 integers expected.");
           params.put("error", 1);
         }
         break;
@@ -177,11 +209,11 @@ public final class Shell {
           try {
             int level = Integer.parseInt(args[1]);
 
-            if (level >= 1 && level <= 4) {
+            if (level >= 1 && level <= 7) {
               params.put("level", level);
             } else {
               System.out.println("Error! Level must be "
-                  + "between 1 and 4");
+                  + "between 1 and 7");
               params.put("error", 1);
             }
           } catch (NumberFormatException nfe) {
@@ -204,10 +236,6 @@ public final class Shell {
   private static void newGame(Player humanPlayer, Player machinePlayer,
       int pits, int seeds) {
     game = new BoardImpl(humanPlayer, machinePlayer, pits, seeds);
-  }
-
-  private static void renderGame() {
-    System.out.println(game.toString());
   }
 
   private static boolean isValid(int[] values) {
