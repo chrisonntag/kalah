@@ -1,6 +1,9 @@
 package kalah.model;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import kalah.model.players.Player;
 import kalah.exceptions.IllegalMoveException;
 
@@ -231,7 +234,17 @@ public class BoardImpl implements Board {
    */
   @Override
   public int getSeedsOfPlayer(Player player) {
-    return 0;
+    int playerRow = 0;
+    if (player == Player.HUMAN) {
+      playerRow = 1;
+    }
+
+    List<Integer> seeds = new ArrayList<>();
+    for (Pit pit : this.pits[playerRow]) {
+      seeds.add(pit.getSeeds());
+    }
+
+    return seeds.stream().reduce(0, Integer::sum);
   }
 
   /**
