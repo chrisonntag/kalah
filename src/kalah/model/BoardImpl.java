@@ -116,6 +116,17 @@ public class BoardImpl implements Board {
   }
 
   /**
+   * Distributes the seeds in {@code pit} counter-clockwise to the next pits
+   * regardless of whether this move is allowed. Should only be called by
+   * {@link #move(int)} or {@link #machineMove()}.
+   *
+   * @param pit The pit from where to take the seeds.
+   */
+  private void sowSeeds(int pit) {
+
+  }
+
+  /**
    * Sets the skill level of the machine.
    *
    * @param level The skill as a number, must be at least 1.
@@ -159,7 +170,14 @@ public class BoardImpl implements Board {
    */
   @Override
   public int getSeeds(int pit) {
-    return 0;
+    int mouldCount = getPitsPerPlayer() + 1;
+    if (pit > mouldCount) {
+      // One of the upper pits.
+      return this.pits[0][(pit - mouldCount * 2) * (-1)].getSeeds();
+    } else {
+      // One of the lower pits.
+      return this.pits[1][pit - 1].getSeeds();
+    }
   }
 
   /**
@@ -191,7 +209,7 @@ public class BoardImpl implements Board {
    */
   @Override
   public int getPitsPerPlayer() {
-    return 0;
+    return DEFAULT_PITS_PER_PLAYER;
   }
 
   /**
@@ -201,7 +219,7 @@ public class BoardImpl implements Board {
    */
   @Override
   public int getSeedsPerPit() {
-    return 0;
+    return DEFAULT_SEEDS_PER_PIT;
   }
 
   /**
