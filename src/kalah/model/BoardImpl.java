@@ -1,13 +1,64 @@
 package kalah.model;
 
+import java.util.Arrays;
 import kalah.model.players.Player;
 import kalah.exceptions.IllegalMoveException;
 
 public class BoardImpl implements Board {
 
-  public BoardImpl(Player firstPlayer, Player secondPlayer,
-      int pits, int seeds) {
+  /**
+   * The number of pits per player in the classical Kalah game.
+   */
+  private int DEFAULT_PITS_PER_PLAYER = 6;
 
+  /**
+   * The initial number of seeds in each pit.
+   */
+  private int DEFAULT_SEEDS_PER_PIT = 3;
+
+  private Player firstPlayer;
+  private Player secondPlayer;
+  private int level;
+
+  private Pit[][] pits;
+
+  public BoardImpl(Player firstPlayer, Player secondPlayer, int level) {
+    this.firstPlayer = firstPlayer;
+    this.secondPlayer = secondPlayer;
+    this.level = level;
+    this.pits = new Pit[2][DEFAULT_PITS_PER_PLAYER + 1];
+  }
+
+  public BoardImpl(Player firstPlayer, Player secondPlayer,
+      int pits, int seeds, int level) {
+    this.firstPlayer = firstPlayer;
+    this.secondPlayer = secondPlayer;
+    this.level = level;
+    DEFAULT_PITS_PER_PLAYER = pits;
+    DEFAULT_SEEDS_PER_PIT = seeds;
+    this.pits = new Pit[2][DEFAULT_PITS_PER_PLAYER + 1];
+
+    populateBoard();
+  }
+
+  private void populateBoard() {
+    for (int i = 0; i < 2; i++) {
+      for (int j = 0; j < DEFAULT_PITS_PER_PLAYER + 1; j++) {
+        if (i == 0 && j == 0) {
+          // Create the store for machine player.
+          this.pits[i][j] = new Store(Player.MACHINE);
+        } else if (i == 1 && j == DEFAULT_PITS_PER_PLAYER) {
+          // Create the store for human player.
+          this.pits[i][j] = new Store(Player.HUMAN);
+        } else if (i == 0) {
+          // Create the pits for machine player.
+          this.pits[i][j] = new Pit(DEFAULT_SEEDS_PER_PIT, Player.MACHINE);
+        } else {
+          // Create the pits for human player.
+          this.pits[i][j] = new Pit(DEFAULT_SEEDS_PER_PIT, Player.HUMAN);
+        }
+      }
+    }
   }
 
   /**
@@ -18,7 +69,7 @@ public class BoardImpl implements Board {
    */
   @Override
   public Player getOpeningPlayer() {
-    return null;
+    return this.firstPlayer;
   }
 
   /**
@@ -71,7 +122,7 @@ public class BoardImpl implements Board {
    */
   @Override
   public void setLevel(int level) {
-
+    this.level = level;
   }
 
   /**
@@ -189,6 +240,19 @@ public class BoardImpl implements Board {
    */
   @Override
   public String toString() {
-    return this.toString();
+    // TODO: only one space between pits
+    StringBuilder sb = new StringBuilder();
+
+    for (int i = 0; i < this.pits.length; i++) {
+      for (int j = 0; j < this.pits[i].length; j++) {
+        sb.append(this.pits[i][j]);
+        sb.append(" \t");
+
+        if (this.pits[i].length == j + 1 && this.pits.length - 1 != i) {
+          sb.append("\n\t\t");
+        }
+      }
+    }
+    return sb.toString();
   }
 }

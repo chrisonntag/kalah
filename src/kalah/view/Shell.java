@@ -10,7 +10,6 @@ import kalah.model.Board;
 import kalah.model.BoardImpl;
 import kalah.model.players.Player;
 import kalah.util.Utility;
-import org.omg.CORBA.PUBLIC_MEMBER;
 
 /**
  * The Shell class represents a basic command line user interface, providing
@@ -19,7 +18,7 @@ import org.omg.CORBA.PUBLIC_MEMBER;
 public final class Shell {
 
   private static Board game = null;
-  private static int level = 3;
+  private static int LEVEL = 3;
   private static int PITS_PER_PLAYER = 6;
   private static int SEEDS_PER_PIT = 4;
   private static Player FIRST_PLAYER = Player.HUMAN;
@@ -53,9 +52,14 @@ public final class Shell {
         scanner.useDelimiter("\n");
         if (scanner.hasNext()) {
           String[] commands = scanner.next().split("\\s+");
-          if (evaluateCommand(commands[0],
-              parseArgs(commands[0], commands))) {
-            quit = true;
+
+          if (commands.length > 0) {
+            if (evaluateCommand(commands[0],
+                parseArgs(commands[0], commands))) {
+              quit = true;
+            }
+          } else {
+            System.out.println("Error! No valid command.");
           }
         } else {
           System.out.println("Error! No valid command.");
@@ -86,11 +90,12 @@ public final class Shell {
         SEEDS_PER_PIT = args.get("seeds");
 
         game = new BoardImpl(FIRST_PLAYER, SECOND_PLAYER,
-            PITS_PER_PLAYER, SEEDS_PER_PIT);
+            PITS_PER_PLAYER, SEEDS_PER_PIT, LEVEL);
         break;
       case 'L':
         if (game != null) {
-          game.setLevel(args.get("level"));
+          LEVEL = args.get("level");
+          game.setLevel(LEVEL);
         } else {
           System.out.println("Error! No game started yet.");
         }
@@ -121,7 +126,7 @@ public final class Shell {
           SECOND_PLAYER = temp;
 
           game = new BoardImpl(FIRST_PLAYER, SECOND_PLAYER,
-              PITS_PER_PLAYER, SEEDS_PER_PIT);
+              PITS_PER_PLAYER, SEEDS_PER_PIT, LEVEL);
         } else {
           System.out.println("Error! No game started yet.");
         }
@@ -150,7 +155,7 @@ public final class Shell {
   }
 
   /**
-   * Checks if a user inputs parameters are valid.
+   * Checks if user input parameters are valid.
    *
    * @param command   a user input command.
    * @param args      possible parameters.
@@ -215,13 +220,11 @@ public final class Shell {
             if (level >= 1 && level <= 7) {
               params.put("level", level);
             } else {
-              System.out.println("Error! Level must be "
-                  + "between 1 and 7");
+              System.out.println("Error! Level must be between 1 and 7");
               params.put("error", 1);
             }
           } catch (NumberFormatException nfe) {
-            System.out.println("Error! The level must "
-                + "be a number.");
+            System.out.println("Error! The level must be a number.");
             params.put("error", 1);
           }
         } else {
