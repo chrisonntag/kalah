@@ -21,8 +21,7 @@ public final class Shell {
   private static int LEVEL = 3;
   private static int PITS_PER_PLAYER = 6;
   private static int SEEDS_PER_PIT = 4;
-  private static Player FIRST_PLAYER = Player.HUMAN;
-  private static Player SECOND_PLAYER = Player.MACHINE;
+  private static Player OPENING_PLAYER = Player.HUMAN;
 
   private Shell() { }
 
@@ -89,8 +88,8 @@ public final class Shell {
         PITS_PER_PLAYER = args.get("pits");
         SEEDS_PER_PIT = args.get("seeds");
 
-        game = new BoardImpl(FIRST_PLAYER, SECOND_PLAYER,
-            PITS_PER_PLAYER, SEEDS_PER_PIT, LEVEL);
+        game = new BoardImpl(OPENING_PLAYER, PITS_PER_PLAYER,
+            SEEDS_PER_PIT, LEVEL);
         break;
       case 'L':
         if (game != null) {
@@ -121,12 +120,11 @@ public final class Shell {
         break;
       case 'S':
         if (game != null) {
-          Player temp = FIRST_PLAYER;
-          FIRST_PLAYER = SECOND_PLAYER;
-          SECOND_PLAYER = temp;
+          Player lastPlayer = game.getOpeningPlayer();
+          OPENING_PLAYER = Player.getOpponent(lastPlayer);
 
-          game = new BoardImpl(FIRST_PLAYER, SECOND_PLAYER,
-              PITS_PER_PLAYER, SEEDS_PER_PIT, LEVEL);
+          game = new BoardImpl(OPENING_PLAYER, PITS_PER_PLAYER,
+              SEEDS_PER_PIT, LEVEL);
         } else {
           System.out.println("Error! No game started yet.");
         }

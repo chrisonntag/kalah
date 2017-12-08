@@ -8,4 +8,8 @@ public class Store extends Pit {
     super(owner);
   }
 
+  @Override
+  public Pit clone() {
+    return super.clone();
+  }
 }

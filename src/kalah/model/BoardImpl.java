@@ -1,9 +1,9 @@
 package kalah.model;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import kalah.model.players.Player;
 import kalah.exceptions.IllegalMoveException;
 
@@ -19,26 +19,28 @@ public class BoardImpl implements Board {
    */
   private int DEFAULT_SEEDS_PER_PIT = 3;
 
-  private Player firstPlayer;
-  private Player secondPlayer;
+  private Player openingPlayer;
   private int level;
 
   private Pit[][] pits;
 
-  public BoardImpl(Player firstPlayer, Player secondPlayer, int level) {
-    this.firstPlayer = firstPlayer;
-    this.secondPlayer = secondPlayer;
+  private BoardImpl(Player openingPlayer, int pitsCount, int seedsCount,
+      int level, Pit[][] pits) {
+    this.openingPlayer = openingPlayer;
     this.level = level;
-    this.pits = new Pit[2][DEFAULT_PITS_PER_PLAYER + 1];
+    DEFAULT_PITS_PER_PLAYER = pitsCount;
+    DEFAULT_SEEDS_PER_PIT = seedsCount;
+    this.pits = pits;
+
+    populateBoard();
   }
 
-  public BoardImpl(Player firstPlayer, Player secondPlayer,
-      int pits, int seeds, int level) {
-    this.firstPlayer = firstPlayer;
-    this.secondPlayer = secondPlayer;
+  public BoardImpl(Player openingPlayer, int pitsCount,
+      int seedsCount, int level) {
+    this.openingPlayer = openingPlayer;
     this.level = level;
-    DEFAULT_PITS_PER_PLAYER = pits;
-    DEFAULT_SEEDS_PER_PIT = seeds;
+    DEFAULT_PITS_PER_PLAYER = pitsCount;
+    DEFAULT_SEEDS_PER_PIT = seedsCount;
     this.pits = new Pit[2][DEFAULT_PITS_PER_PLAYER + 1];
 
     populateBoard();
@@ -72,7 +74,7 @@ public class BoardImpl implements Board {
    */
   @Override
   public Player getOpeningPlayer() {
-    return this.firstPlayer;
+    return this.openingPlayer;
   }
 
   /**
@@ -82,7 +84,7 @@ public class BoardImpl implements Board {
    */
   @Override
   public Player next() {
-    return null;
+    return Player.getOpponent(this.openingPlayer);
   }
 
   /**
@@ -254,7 +256,16 @@ public class BoardImpl implements Board {
    */
   @Override
   public Board clone() {
-    return null;
+    Pit[][] newPits = new Pit[2][this.DEFAULT_PITS_PER_PLAYER + 1];
+
+    for (int i = 0; i < 2; i++) {
+      for (int j = 0; j < this.DEFAULT_PITS_PER_PLAYER + 1; j++) {
+        newPits[i][j] = this.pits[i][j].clone();
+      }
+    }
+
+    return new BoardImpl(this.next(), this.DEFAULT_PITS_PER_PLAYER,
+        this.DEFAULT_SEEDS_PER_PIT, this.level, newPits);
   }
 
   /**

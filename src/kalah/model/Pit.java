@@ -2,7 +2,7 @@ package kalah.model;
 
 import kalah.model.players.Player;
 
-public class Pit {
+public class Pit implements Cloneable {
 
   private int seeds = 0;
   private Player owner;
@@ -35,5 +35,9 @@ public class Pit {
   @Override
   public String toString() {
     return "" + this.seeds;
+  }
+
+  public Pit clone() {
+    return new Pit(this.getSeeds(), this.getOwner());
   }
 }
