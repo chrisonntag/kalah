@@ -109,7 +109,7 @@ public final class Shell {
 
           if (game.isGameOver()) {
             getWinner();
-          } else if (game.next() == Player.MACHINE) {
+          } else if (game.getOpeningPlayer() == Player.MACHINE) {
             machineMove();
           } else {
             System.out.println(Utility.MACHINE_MISS);
@@ -251,9 +251,8 @@ public final class Shell {
   private static void machineMove() {
     game = game.machineMove();
 
-    if (game.next() == Player.MACHINE) {
-      while (game.next() == Player.MACHINE
-          && !game.isGameOver()) {
+    if (game.getOpeningPlayer() == Player.MACHINE) {
+      while (game.getOpeningPlayer() == Player.MACHINE && !game.isGameOver()) {
         System.out.println(Utility.HUMAN_MISS);
         machineMove();
       }
