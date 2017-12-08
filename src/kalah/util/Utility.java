@@ -19,4 +19,7 @@ public class Utility {
   public static final String STALEMATE = "Nobody wins. Tie with %d seeds "
       + "for each player.%n";
 
+  public static final String MACHINE_MOVE = "Machine chose pit %d with seeds "
+      + "reaching pit %d.";
+
 }
