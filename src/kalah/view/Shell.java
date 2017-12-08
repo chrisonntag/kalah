@@ -104,7 +104,8 @@ public final class Shell {
           try {
             game = game.move(args.get("pit"));
           } catch (IllegalMoveException | IllegalArgumentException e) {
-            System.out.printf(e.getMessage());
+            System.out.println(e.getMessage());
+            break;
           }
 
           if (game.isGameOver()) {
