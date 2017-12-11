@@ -6,14 +6,23 @@ public class Pit implements Cloneable {
 
   private int seeds = 0;
   private Player owner;
+  private boolean isStore;
 
-  public Pit(Player owner) {
+  public Pit(Player owner, boolean isStore) {
     this.owner = owner;
+    this.isStore = isStore;
   }
 
-  public Pit(int seeds, Player owner) {
-    this.seeds = seeds;
+  public Pit(Player owner, int seeds) {
     this.owner = owner;
+    this.isStore = isStore;
+    this.seeds = seeds;
+  }
+
+  private Pit(Player owner, boolean isStore, int seeds) {
+    this.owner = owner;
+    this.isStore = isStore;
+    this.seeds = seeds;
   }
 
   public int getSeeds() {
@@ -24,6 +33,10 @@ public class Pit implements Cloneable {
     this.seeds = seeds;
   }
 
+  public void addSeeds(int seeds) {
+    this.seeds += seeds;
+  }
+
   public Player getOwner() {
     return owner;
   }
@@ -32,12 +45,16 @@ public class Pit implements Cloneable {
     this.owner = owner;
   }
 
+  public boolean isStore() {
+    return this.isStore;
+  }
+
   @Override
   public String toString() {
     return "" + this.seeds;
   }
 
   public Pit clone() {
-    return new Pit(this.getSeeds(), this.getOwner());
+    return new Pit(this.getOwner(), this.isStore, this.getSeeds());
   }
 }

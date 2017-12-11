@@ -102,7 +102,14 @@ public final class Shell {
       case 'M':
         if (game != null) {
           try {
-            game = game.move(args.get("pit"));
+            Board board = game.move(args.get("pit"));
+
+            if (board != null) {
+              game = board;
+            } else {
+              System.out.println("Error! Invalid move!");
+              break;
+            }
           } catch (IllegalMoveException | IllegalArgumentException e) {
             System.out.println(e.getMessage());
             break;
@@ -251,6 +258,7 @@ public final class Shell {
 
   private static void machineMove() {
     game = game.machineMove();
+    System.out.println("Machine moves...");
 
     if (game.getOpeningPlayer() == Player.MACHINE) {
       while (game.getOpeningPlayer() == Player.MACHINE && !game.isGameOver()) {
@@ -258,6 +266,8 @@ public final class Shell {
         machineMove();
       }
     }
+
+    System.out.println("Machine finished move.");
 
     if (game.isGameOver()) {
       getWinner();
