@@ -86,6 +86,7 @@ public class BoardImpl implements Board {
     if (targetPitOfLastMove() > 0) {
       Pit lastPit = getPit(targetPitOfLastMove());
 
+      // Check if the next user must miss a turn.
       if (lastPit.isStore() && lastPit.getOwner() == getOpeningPlayer()) {
         return getOpeningPlayer();
       } else {
@@ -158,8 +159,7 @@ public class BoardImpl implements Board {
     this.sourcePitOfLastMove = pit;
     this.targetPitOfLastMove = normalizePitNum(pitCount);
 
-    // Check if catching is possible.
-    // TODO: not on stores
+    // Check if catching is possible and update the pits.
     Pit targetPit = getPit(targetPitOfLastMove());
     Pit opposingPit = getPit(
         (DEFAULT_PITS_PER_PLAYER + 1) * 2 - targetPitOfLastMove()
@@ -170,6 +170,7 @@ public class BoardImpl implements Board {
       opposingPit.setSeeds(0);
       targetPit.setSeeds(0);
 
+      // Decide which player gets the captured seeds.
       if (getOpeningPlayer() == Player.HUMAN) {
         getPit(DEFAULT_PITS_PER_PLAYER + 1).addSeeds(holdingSeeds);
       } else {
@@ -178,7 +179,16 @@ public class BoardImpl implements Board {
     }
   }
 
+  /**
+   * Converts numbers bigger than the maximum of pits into a
+   * valid pit number bigger than zero.
+   *
+   * @param pit The pit number.
+   * @return The normalized pit number.
+   */
   private int normalizePitNum(int pit) {
+    // Subtract one and add it again after the modulo
+    // operation in order to start at number one.
     return (pit - 1) % ((DEFAULT_PITS_PER_PLAYER + 1) * 2) + 1;
   }
 
@@ -237,11 +247,18 @@ public class BoardImpl implements Board {
     return null;
   }
 
+  /**
+   * Returns the pit object of a given pit number.
+   *
+   * @param pit The pit number.
+   * @return The pit object on number {@code pit}.
+   */
   private Pit getPit(int pit) {
-    int mouldCount = getPitsPerPlayer() + 1;
-    if (pit > mouldCount) {
+    int pitsPerRow = getPitsPerPlayer() + 1;
+
+    if (pit > pitsPerRow) {
       // One of the upper pits.
-      return this.pits[0][(pit - mouldCount * 2) * (-1)];
+      return this.pits[0][(pit - pitsPerRow * 2) * (-1)];
     } else {
       // One of the lower pits.
       return this.pits[1][pit - 1];
@@ -310,6 +327,7 @@ public class BoardImpl implements Board {
    */
   @Override
   public int getSeedsOfPlayer(Player player) {
+    // TODO: Magic number: Set HUMAN_ROW and MACHINE_ROW
     int playerRow = 0;
     if (player == Player.HUMAN) {
       playerRow = 1;
@@ -320,6 +338,7 @@ public class BoardImpl implements Board {
       seeds.add(pit.getSeeds());
     }
 
+    // Sum up the list of seeds of each pit.
     return seeds.stream().reduce(0, (a, b) -> a + b);
   }
 
