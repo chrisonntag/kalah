@@ -202,7 +202,26 @@ public class BoardImpl implements Board {
    */
   @Override
   public boolean isGameOver() {
-    return false;
+    boolean upperRowPitsEmpty = true;
+    boolean lowerRowPitsEmpty = true;
+
+    // TODO: Magic number: Set HUMAN_ROW and MACHINE_ROW
+    for (int i = 0; i < 2; i++) {
+      for (int j = 0; j <= DEFAULT_PITS_PER_PLAYER; j++) {
+        // Check if a players row only contains empty pits.
+        if (!this.pits[i][j].isStore() && this.pits[i][j].getSeeds() > 0) {
+          if (i == 0) {
+            upperRowPitsEmpty = false;
+          } else {
+            lowerRowPitsEmpty = false;
+          }
+          break; // Break loop at the first pit with more than one seed.
+        }
+      }
+    }
+
+    // The game ends if either the players or the opponents pits are empty.
+    return upperRowPitsEmpty || lowerRowPitsEmpty;
   }
 
   /**
@@ -210,7 +229,28 @@ public class BoardImpl implements Board {
    */
   @Override
   public Player getWinner() {
-    return null;
+    int upperSeeds = 0;
+    int lowerSeeds = 0;
+
+    // TODO: Magic number: Set HUMAN_ROW and MACHINE_ROW
+    for (int i = 0; i < 2; i++) {
+      for (int j = 0; j <= DEFAULT_PITS_PER_PLAYER; j++) {
+        if (i == 0) {
+          upperSeeds += this.pits[i][j].getSeeds();
+        } else {
+          lowerSeeds += this.pits[i][j].getSeeds();
+        }
+      }
+    }
+
+    // TODO: Magic number: Set HUMAN_ROW and MACHINE_ROW
+    if (upperSeeds > lowerSeeds) {
+      return Player.MACHINE;
+    } else if (upperSeeds < lowerSeeds) {
+      return Player.HUMAN;
+    } else {
+      return null;
+    }
   }
 
   /**
