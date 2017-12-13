@@ -20,6 +20,7 @@ public class BoardImpl implements Board {
   private Player openingPlayer;
   private int level;
 
+  // TODO: Check switching to minimal int[][] array.
   private Pit[][] pits;
 
   private int sourcePitOfLastMove = 0;
@@ -36,6 +37,7 @@ public class BoardImpl implements Board {
 
   public BoardImpl(Player openingPlayer, int pitsCount,
       int seedsCount, int level) {
+    // TODO: class secret?
     this.openingPlayer = openingPlayer;
     this.level = level;
     DEFAULT_PITS_PER_PLAYER = pitsCount;
@@ -105,6 +107,8 @@ public class BoardImpl implements Board {
       try {
         if (getSeeds(pit) == 0 || getPit(pit).isStore()
             || getPit(pit).getOwner() != getOpeningPlayer()) {
+          // TODO: null is an undeclared state --> better return
+          // IllegalStateException
           return null;
         }
       } catch (ArrayIndexOutOfBoundsException e) {

@@ -104,6 +104,7 @@ public final class Shell {
           try {
             Board board = game.move(args.get("pit"));
 
+            // TODO: only accept 1-6 (NUM_PITS) as valid arguments.
             if (board != null) {
               game = board;
             } else {
