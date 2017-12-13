@@ -26,7 +26,7 @@ public final class Shell {
   private Shell() { }
 
   /**
-   * This is the main method which instantiates the the BufferedReader
+   * This is the main method which instantiates the BufferedReader
    * accepting user input.
    *
    * @param args          unused.
