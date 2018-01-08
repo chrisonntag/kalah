@@ -1,7 +1,9 @@
 package kalah.model;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import kalah.controller.Node;
 import kalah.model.players.Player;
 import kalah.exceptions.IllegalMoveException;
 
@@ -149,9 +151,7 @@ public class BoardImpl implements Board {
 
     // Check if catching is possible and update the pits.
     Pit targetPit = getPit(targetPitOfLastMove());
-    Pit opposingPit = getPit(
-        (DEFAULT_PITS_PER_PLAYER + 1) * 2 - targetPitOfLastMove()
-    );
+    Pit opposingPit = getPit(getOpposingPitNum(targetPitOfLastMove()));
     if (!targetPit.isStore()
         && opposingPit.getSeeds() > 0 && targetPit.getSeeds() == 1) {
       int holdingSeeds = opposingPit.getSeeds() + targetPit.getSeeds();
@@ -180,15 +180,154 @@ public class BoardImpl implements Board {
     return (pit - 1) % ((DEFAULT_PITS_PER_PLAYER + 1) * 2) + 1;
   }
 
+  private int getOpposingPitNum(int pit) {
+    return (DEFAULT_PITS_PER_PLAYER + 1) * 2 - pit;
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
   public Board machineMove() {
-    BoardImpl board = this.clone();
-    board.openingPlayer = board.next();
+    Node root = constructTree(0);
+    root.updateScore();
 
-    return board;
+    return root.getMax().getBoard();
+  }
+
+  private Node constructTree(int depth) {
+    if (depth == level || isGameOver()) {
+      return new Node(this.clone(), null, this.calcScore(depth));
+    } else {
+      Node root = new Node(this, this.calcScore(depth));
+
+      for (Board board : getPossibleGameStates(Player.MACHINE)) {
+        root.addChild(
+            ((BoardImpl) board).constructTree(depth + 1)
+        );
+      }
+      return root;
+    }
+  }
+
+  private ArrayList<Board> getPossibleGameStates(Player player) {
+    // TODO: is ArrayList useful here?
+    ArrayList<Board> gameStates = new ArrayList<>();
+    for (int pitNum : getPlayerPits(player)) {
+      if (getPit(pitNum).getSeeds() != 0) {
+        gameStates.add(this.move(pitNum));
+      }
+    }
+
+    return gameStates;
+  }
+
+  private double calcScore(int depth) {
+    // Evaluate seeds in the stores.
+    int machineStore = (DEFAULT_PITS_PER_PLAYER + 1) * 2;
+    int humanStore = DEFAULT_PITS_PER_PLAYER + 1;
+
+    double scoreS = getSeeds(machineStore) - 1.5 * getSeeds(humanStore);
+
+    // Evaluate number of opposing seeds which can be captured in this move.
+    double catchableHumanSeeds = 0; // the ones the machine can catch
+    double catchableMachineSeeds = 0; // the ones the human can catch
+
+    // Implicit downcast (TODO?)
+    for (int target : getPossibleTargetPits(Player.HUMAN)) {
+      // TODO: Check only own pits?
+      if (getPit(target).getSeeds() == 0
+          && getPit(target).getOwner() == Player.HUMAN) {
+        catchableMachineSeeds += getPit(getOpposingPitNum(target)).getSeeds();
+      }
+    }
+
+    for (int target : getPossibleTargetPits(Player.MACHINE)) {
+      // TODO: Check only own pits?
+      if (getPit(target).getSeeds() == 0
+          && getPit(target).getOwner() == Player.MACHINE) {
+        catchableHumanSeeds += getPit(getOpposingPitNum(target)).getSeeds();
+      }
+    }
+    double scoreC = catchableHumanSeeds - 1.5 * catchableMachineSeeds;
+
+    // Evaluate the number of empty pits whose opposing opposite
+    // pits contain at least twice the number of seeds as initial
+    // per hollow at game start.
+    double emptyHumanPits = 0;
+    double emptyMachinePits = 0;
+    for (int pitNum : getPlayerPits(Player.HUMAN)) {
+      if (getPit(pitNum).getSeeds() == 0
+          && getPit(getOpposingPitNum(pitNum)).getSeeds()
+          >= 2 * getSeedsPerPit()) {
+        emptyHumanPits += 1;
+      }
+    }
+
+    for (int pitNum : getPlayerPits(Player.MACHINE)) {
+      if (getPit(pitNum).getSeeds() == 0
+          && getPit(getOpposingPitNum(pitNum)).getSeeds()
+          >= 2 * getSeedsPerPit()) {
+        emptyMachinePits += 1;
+      }
+    }
+
+    double scoreP = emptyMachinePits - 1.5 * emptyHumanPits;
+
+    // Evaluate if a move leads to a victory immediately.
+    double scoreV;
+    if (!isGameOver()) {
+      scoreV = 0;
+    } else {
+      if (getWinner() == null) {
+        scoreV = 0;
+      } else {
+        if (getWinner() == Player.HUMAN) {
+          return -1.5 * (500.0 / depth);
+        } else {
+          return 500.0 / depth;
+        }
+      }
+    }
+
+    return 3 * scoreS + scoreC + scoreP + scoreV;
+  }
+
+  private ArrayList<Integer> getPlayerPits(Player player) {
+    ArrayList<Integer> playerPits = new ArrayList<>();
+    int firstPitNum = 1;
+    int lastPitNum = getPitsPerPlayer();
+    if (player == Player.MACHINE) {
+      firstPitNum = getPitsPerPlayer() + 2; // TODO: magic number
+      lastPitNum = getPitsPerPlayer() * 2 + 1;
+    }
+
+    // TODO: magic number
+    for (int i = firstPitNum; i <= lastPitNum; i++) {
+      playerPits.add(i);
+    }
+
+    return playerPits;
+  }
+
+  /**
+   * Returns a list of target pits which can be reached in this move.
+   *
+   * @param player The player which can capture.
+   * @return A list of pits
+   */
+  private ArrayList<Integer> getPossibleTargetPits(Player player) {
+    ArrayList<Integer> targetPitNums = new ArrayList<>();
+
+    for (int pitNum : getPlayerPits(player)) {
+      Pit sourcePit = getPit(pitNum);
+      if (sourcePit.getSeeds() != 0) {
+        int targetPitNum = pitNum + sourcePit.getSeeds();
+        targetPitNums.add(targetPitNum);
+      }
+    }
+
+    return targetPitNums;
   }
 
   /**
@@ -341,6 +480,7 @@ public class BoardImpl implements Board {
   @Override
   public BoardImpl clone() {
     // TODO: use Arrays.copy
+    // TODO: use super.clone()
     Pit[][] newPits = new Pit[2][this.DEFAULT_PITS_PER_PLAYER + 1];
 
     for (int i = 0; i < 2; i++) {

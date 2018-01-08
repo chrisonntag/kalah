@@ -172,6 +172,7 @@ public final class Shell {
       String[] args) {
     HashMap<String, Integer> params = new HashMap<>();
     params.put("error", 0);
+    // TODO: Add own error method
 
     switch (Character.toUpperCase(command.toCharArray()[0])) {
       case 'N':

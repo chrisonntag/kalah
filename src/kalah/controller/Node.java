@@ -31,6 +31,10 @@ public class Node {
     this.children = children;
   }
 
+  public void addChild(Node node) {
+    this.children.add(node);
+  }
+
   public double getScore() {
     return score;
   }
