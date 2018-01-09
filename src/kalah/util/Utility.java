@@ -20,6 +20,6 @@ public class Utility {
       + "for each player.%n";
 
   public static final String MACHINE_MOVE = "Machine chose pit %d with seeds "
-      + "reaching pit %d.";
+      + "reaching pit %d.%n";
 
 }

@@ -260,16 +260,16 @@ public final class Shell {
 
   private static void machineMove() {
     game = game.machineMove();
-    System.out.println("Machine moves...");
+    System.out.format(Utility.MACHINE_MOVE, game.sourcePitOfLastMove(),
+        game.targetPitOfLastMove());
 
+    // TODO: redundant opening==machine check?
     if (game.getOpeningPlayer() == Player.MACHINE) {
       while (game.getOpeningPlayer() == Player.MACHINE && !game.isGameOver()) {
         System.out.println(Utility.HUMAN_MISS);
         machineMove();
       }
     }
-
-    System.out.println("Machine finished move.");
 
     if (game.isGameOver()) {
       getWinner();
