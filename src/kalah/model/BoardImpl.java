@@ -1,12 +1,14 @@
 package kalah.model;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import kalah.controller.Node;
 import kalah.model.players.Player;
 import kalah.exceptions.IllegalMoveException;
 
+// TODO: work with zero indexed-pits! Check!
 public class BoardImpl implements Board {
 
   /**
@@ -29,12 +31,14 @@ public class BoardImpl implements Board {
   private int targetPitOfLastMove = 0;
 
   private BoardImpl(Player openingPlayer, int pitsCount, int seedsCount,
-      int level, Pit[][] pits) {
+      int level, Pit[][] pits, int sourcePit, int targetPit) {
     this.openingPlayer = openingPlayer;
     this.level = level;
     DEFAULT_PITS_PER_PLAYER = pitsCount;
     DEFAULT_SEEDS_PER_PIT = seedsCount;
     this.pits = pits;
+    this.sourcePitOfLastMove = sourcePit;
+    this.targetPitOfLastMove = targetPit;
   }
 
   public BoardImpl(Player openingPlayer, int pitsCount,
@@ -82,7 +86,7 @@ public class BoardImpl implements Board {
    */
   @Override
   public Player next() {
-    if (targetPitOfLastMove() > 0) {
+    if (targetPitOfLastMove() > 0 && !isGameOver()) {
       Pit lastPit = getPit(targetPitOfLastMove());
 
       // Check if the next user must miss a turn.
@@ -93,7 +97,7 @@ public class BoardImpl implements Board {
       }
     }
 
-    return Player.getOpponent(getOpeningPlayer());
+    return Player.NONE;
   }
 
   /**
@@ -109,8 +113,8 @@ public class BoardImpl implements Board {
       try {
         if (getSeeds(pit) == 0 || getPit(pit).isStore()
             || getPit(pit).getOwner() != getOpeningPlayer()) {
-          // TODO: null is an undeclared state --> better return
-          // IllegalStateException
+          // TODO: null is an undeclared state
+          // TODO: --> better return IllegalStateException
           return null;
         }
       } catch (ArrayIndexOutOfBoundsException e) {
@@ -146,13 +150,13 @@ public class BoardImpl implements Board {
       }
     }
 
-    this.sourcePitOfLastMove = pit;
-    this.targetPitOfLastMove = normalizePitNum(pitCount);
+    sourcePitOfLastMove = pit;
+    targetPitOfLastMove = normalizePitNum(pitCount);
 
     // Check if catching is possible and update the pits.
     Pit targetPit = getPit(targetPitOfLastMove());
     Pit opposingPit = getPit(getOpposingPitNum(targetPitOfLastMove()));
-    if (!targetPit.isStore()
+    if (!targetPit.isStore() && targetPit.getOwner() == getOpeningPlayer()
         && opposingPit.getSeeds() > 0 && targetPit.getSeeds() == 1) {
       int holdingSeeds = opposingPit.getSeeds() + targetPit.getSeeds();
       opposingPit.setSeeds(0);
@@ -181,7 +185,14 @@ public class BoardImpl implements Board {
   }
 
   private int getOpposingPitNum(int pit) {
-    return (DEFAULT_PITS_PER_PLAYER + 1) * 2 - pit;
+    int maxPitNum = (DEFAULT_PITS_PER_PLAYER + 1) * 2;
+    if (pit == maxPitNum) {
+      return maxPitNum / 2;
+    } else if (pit == maxPitNum / 2) {
+      return maxPitNum;
+    } else {
+      return maxPitNum - pit;
+    }
   }
 
   /**
@@ -191,20 +202,59 @@ public class BoardImpl implements Board {
   public Board machineMove() {
     Node root = constructTree(0);
     root.updateScore();
+    BoardImpl machineBoard = (BoardImpl) root.getMaxChild().getBoard();
 
-    return root.getMax().getBoard();
+    // TODO: DEBUG statements
+    System.out.println(printTree(root));
+    System.out.println(machineBoard);
+
+    return machineBoard;
   }
 
+  // TODO: remove before production
+  private String printTree(Node root) {
+    if (root.getChildren() != null) {
+      StringBuilder sb = new StringBuilder();
+      for (Node node : root.getChildren()) {
+        for (int i = 1; i < node.getLevel(); i++) {
+          sb.append("  ");
+        }
+        sb.append(node.getBoard().sourcePitOfLastMove());
+        sb.append(": L=");
+        sb.append(node.getLocalScore());
+        sb.append(", G=");
+        sb.append(node.getScore());
+        sb.append("\n");
+
+        sb.append(printTree(node));
+      }
+      return sb.toString();
+    }
+    return "";
+  }
+
+  /**
+   * Recursively construct the tree.
+   *
+   * @param depth The current depth of the tree in this recursion.
+   * @return The root node of the tree.
+   */
   private Node constructTree(int depth) {
     if (depth == level || isGameOver()) {
-      return new Node(this.clone(), null, this.calcScore(depth));
+      // Create a leave.
+      return new Node(this.clone(), null, this.calcScore(depth), depth);
     } else {
-      Node root = new Node(this, this.calcScore(depth));
+      // Create a new sub-tree.
+      Node root = new Node(this.clone(), this.calcScore(depth), depth);
+      //System.out.println("\t\t\t\tR: " + root.getScore());
 
-      for (Board board : getPossibleGameStates(Player.MACHINE)) {
-        root.addChild(
-            ((BoardImpl) board).constructTree(depth + 1)
-        );
+      // TODO: Check role of opening and next player.
+      ArrayList<Board> possibleStates =
+          getPossibleGameStates(getOpeningPlayer());
+      for (Board board : possibleStates) {
+        Node child = ((BoardImpl) board).constructTree(depth + 1);
+        root.addChild(child);
+        //System.out.println("\tC: " + child.getScore());
       }
       return root;
     }
@@ -215,7 +265,11 @@ public class BoardImpl implements Board {
     ArrayList<Board> gameStates = new ArrayList<>();
     for (int pitNum : getPlayerPits(player)) {
       if (getPit(pitNum).getSeeds() != 0) {
-        gameStates.add(this.move(pitNum));
+        BoardImpl state = this.clone();
+        state.sowSeeds(pitNum);
+        // TODO: Check role of opening and next player.
+        state.openingPlayer = state.next();
+        gameStates.add(state);
       }
     }
 
@@ -223,6 +277,8 @@ public class BoardImpl implements Board {
   }
 
   private double calcScore(int depth) {
+    // TODO: shorten this method.
+
     // Evaluate seeds in the stores.
     int machineStore = (DEFAULT_PITS_PER_PLAYER + 1) * 2;
     int humanStore = DEFAULT_PITS_PER_PLAYER + 1;
@@ -232,20 +288,27 @@ public class BoardImpl implements Board {
     // Evaluate number of opposing seeds which can be captured in this move.
     double catchableHumanSeeds = 0; // the ones the machine can catch
     double catchableMachineSeeds = 0; // the ones the human can catch
+    Set<Integer> targetPitsHuman = getPossibleTargetPits(Player.HUMAN);
+    Set<Integer> targetPitsMachine =
+        getPossibleTargetPits(Player.MACHINE);
 
-    // Implicit downcast (TODO?)
-    for (int target : getPossibleTargetPits(Player.HUMAN)) {
-      // TODO: Check only own pits?
+    // TODO: primitive downcast Integer list to int?
+    // Loops through all possible target pits of the human in order to find
+    // catchable seeds of the machine.
+    for (int target : targetPitsHuman) {
       if (getPit(target).getSeeds() == 0
-          && getPit(target).getOwner() == Player.HUMAN) {
+          && getPit(target).getOwner() == Player.HUMAN
+          && !getPit(target).isStore()) {
         catchableMachineSeeds += getPit(getOpposingPitNum(target)).getSeeds();
       }
     }
 
-    for (int target : getPossibleTargetPits(Player.MACHINE)) {
-      // TODO: Check only own pits?
+    // Loops through all possible target pits of the machine in order to find
+    // catchable seeds of the human.
+    for (int target : targetPitsMachine) {
       if (getPit(target).getSeeds() == 0
-          && getPit(target).getOwner() == Player.MACHINE) {
+          && getPit(target).getOwner() == Player.MACHINE
+          && !getPit(target).isStore()) {
         catchableHumanSeeds += getPit(getOpposingPitNum(target)).getSeeds();
       }
     }
@@ -311,18 +374,21 @@ public class BoardImpl implements Board {
   }
 
   /**
-   * Returns a list of target pits which can be reached in this move.
+   * Returns a set of target pits which can be reached in this move. Due to the
+   * property of a set not allowing duplicates the target pits will occur only
+   * once even if they can be reached by several different source pits. This
+   * ensures that pits won't be counted twice.
    *
    * @param player The player which can capture.
-   * @return A list of pits
+   * @return A set of pits
    */
-  private ArrayList<Integer> getPossibleTargetPits(Player player) {
-    ArrayList<Integer> targetPitNums = new ArrayList<>();
+  private Set<Integer> getPossibleTargetPits(Player player) {
+    Set<Integer> targetPitNums = new HashSet<>();
 
     for (int pitNum : getPlayerPits(player)) {
       Pit sourcePit = getPit(pitNum);
       if (sourcePit.getSeeds() != 0) {
-        int targetPitNum = pitNum + sourcePit.getSeeds();
+        int targetPitNum = normalizePitNum(pitNum + sourcePit.getSeeds());
         targetPitNums.add(targetPitNum);
       }
     }
@@ -372,24 +438,10 @@ public class BoardImpl implements Board {
    */
   @Override
   public Player getWinner() {
-    int upperSeeds = 0;
-    int lowerSeeds = 0;
-
-    // TODO: Magic number: Set HUMAN_ROW and MACHINE_ROW
-    for (int i = 0; i < 2; i++) {
-      for (int j = 0; j <= DEFAULT_PITS_PER_PLAYER; j++) {
-        if (i == 0) {
-          upperSeeds += this.pits[i][j].getSeeds();
-        } else {
-          lowerSeeds += this.pits[i][j].getSeeds();
-        }
-      }
-    }
-
-    // TODO: Magic number: Set HUMAN_ROW and MACHINE_ROW
-    if (upperSeeds > lowerSeeds) {
+    if (getSeedsOfPlayer(Player.MACHINE) > getSeedsOfPlayer(Player.HUMAN)) {
       return Player.MACHINE;
-    } else if (upperSeeds < lowerSeeds) {
+    } else if (getSeedsOfPlayer(Player.MACHINE)
+        < getSeedsOfPlayer(Player.HUMAN)) {
       return Player.HUMAN;
     } else {
       return null;
@@ -403,6 +455,7 @@ public class BoardImpl implements Board {
    * @return The pit object on number {@code pit}.
    */
   private Pit getPit(int pit) {
+    // TODO: exception for not valid numbers?
     int pitsPerRow = getPitsPerPlayer() + 1;
 
     if (pit > pitsPerRow) {
@@ -427,6 +480,7 @@ public class BoardImpl implements Board {
    */
   @Override
   public int sourcePitOfLastMove() {
+    // TODO: The number of the move opponent's stores is not possible?
     return this.sourcePitOfLastMove;
   }
 
@@ -435,6 +489,7 @@ public class BoardImpl implements Board {
    */
   @Override
   public int targetPitOfLastMove() {
+    // TODO: The number of the move opponent's stores is not possible?
     return this.targetPitOfLastMove;
   }
 
@@ -490,7 +545,8 @@ public class BoardImpl implements Board {
     }
 
     return new BoardImpl(this.getOpeningPlayer(), this.DEFAULT_PITS_PER_PLAYER,
-        this.DEFAULT_SEEDS_PER_PIT, this.level, newPits);
+        this.DEFAULT_SEEDS_PER_PIT, this.level, newPits, sourcePitOfLastMove(),
+        targetPitOfLastMove());
   }
 
   /**
@@ -498,7 +554,7 @@ public class BoardImpl implements Board {
    */
   @Override
   public String toString() {
-    // TODO: only one space between pits
+    // TODO: only one space between pits, no tabs
     StringBuilder sb = new StringBuilder();
 
     for (int i = 0; i < this.pits.length; i++) {
