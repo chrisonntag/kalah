@@ -2,6 +2,7 @@ package kalah.model;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import kalah.controller.Node;
@@ -555,18 +556,67 @@ public class BoardImpl implements Board {
   @Override
   public String toString() {
     // TODO: only one space between pits, no tabs
-    StringBuilder sb = new StringBuilder();
+    List<Integer> decimalPlaces = new LinkedList<>();
+    StringBuilder upperRow = new StringBuilder();
+    StringBuilder lowerRow = new StringBuilder();
 
-    for (int i = 0; i < this.pits.length; i++) {
-      for (int j = 0; j < this.pits[i].length; j++) {
-        sb.append(this.pits[i][j]);
-        sb.append(" \t");
+    for (int j = 1; j < getPitsPerPlayer() + 1; j++) {
+      // Evaluate maximum number of decimal places.
+      int maxDecPlaces = 1;
 
-        if (this.pits[i].length == j + 1 && this.pits.length - 1 != i) {
-          sb.append("\n\t\t");
+      for (int i = 0; i < this.pits.length; i++) {
+        if (i == 1) {
+          if (this.pits[i][j - 1].toString().length() > maxDecPlaces) {
+            maxDecPlaces = this.pits[i][j - 1].toString().length();
+          }
+        } else {
+          if (this.pits[i][j].toString().length() > maxDecPlaces) {
+            maxDecPlaces = this.pits[i][j].toString().length();
+          }
+        }
+      }
+
+      decimalPlaces.add(maxDecPlaces);
+    }
+
+    int lowerRowLeftMargin = 0;
+    for (int j = 0; j < getPitsPerPlayer() + 1; j++) {
+      for (int i = 0; i < this.pits.length; i++) {
+        int maxDecPlaces = 0;
+        if (j == 0 && i == 0) {
+          lowerRowLeftMargin = this.pits[i][j].toString().length() + 1;
+        } else if (j != getPitsPerPlayer()) {
+          if (j > 0 && i == 0) {
+            maxDecPlaces = decimalPlaces.get(j - 1);
+          } else {
+            maxDecPlaces = decimalPlaces.get(j);
+          }
+        }
+        StringBuilder pit = new StringBuilder();
+        int pitLength = this.pits[i][j].toString().length();
+
+        if (pitLength < maxDecPlaces) {
+          for (int k = 0; k < maxDecPlaces - pitLength; k++) {
+            pit.append(" ");
+          }
+        }
+
+        pit.append(this.pits[i][j].toString());
+        pit.append(" ");
+
+        if (i == 0) {
+          upperRow.append(pit);
+        } else {
+          lowerRow.append(pit);
         }
       }
     }
-    return sb.toString();
+
+    for (int i = 0; i < lowerRowLeftMargin; i++) {
+      lowerRow.insert(0, " ");
+    }
+    upperRow.append("\n");
+
+    return upperRow.toString() + lowerRow.toString();
   }
 }
