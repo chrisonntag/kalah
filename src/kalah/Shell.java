@@ -1,4 +1,4 @@
-package kalah.view;
+package kalah;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,10 +21,10 @@ import kalah.util.UserCommunication;
 public final class Shell {
 
   private static Board game = null;
-  private static int LEVEL = 3;
-  private static int PITS_PER_PLAYER = 6;
-  private static int SEEDS_PER_PIT = 4;
-  private static Player OPENING_PLAYER = Player.HUMAN;
+  private static int level = 3;
+  private static int pitsPerPlayer = 6;
+  private static int seedsPerPit = 4;
+  private static Player openingPlayer = Player.HUMAN;
 
   private Shell() { }
 
@@ -88,16 +88,16 @@ public final class Shell {
 
     switch (Character.toUpperCase(command.toCharArray()[0])) {
       case 'N':
-        PITS_PER_PLAYER = args.get("pits");
-        SEEDS_PER_PIT = args.get("seeds");
+        pitsPerPlayer = args.get("pits");
+        seedsPerPit = args.get("seeds");
 
-        game = new BoardImpl(OPENING_PLAYER, PITS_PER_PLAYER, SEEDS_PER_PIT,
-            LEVEL);
+        game = new BoardImpl(openingPlayer, pitsPerPlayer, seedsPerPit,
+            level);
         break;
       case 'L':
         if (game != null) {
-          LEVEL = args.get("level");
-          game.setLevel(LEVEL);
+          level = args.get("level");
+          game.setLevel(level);
         } else {
           System.out.println(getError(300));
         }
@@ -108,14 +108,12 @@ public final class Shell {
             Board board = game.move(args.get("pit"));
 
             // TODO: only accept 1-6 (NUM_PITS) as valid arguments.
-            if (board != null) {
-              game = board;
-            } else {
-              System.out.println(getError(402));
-              break;
-            }
+            game = board;
           } catch (IllegalMoveException | IllegalArgumentException e) {
             System.out.println(e.getMessage());
+            break;
+          } catch (IllegalStateException e) {
+            System.out.println(getError(402));
             break;
           }
 
@@ -135,10 +133,10 @@ public final class Shell {
         break;
       case 'S':
         if (game != null) {
-          OPENING_PLAYER = Player.getOpponent(OPENING_PLAYER);
+          openingPlayer = Player.getOpponent(openingPlayer);
 
-          game = new BoardImpl(OPENING_PLAYER, PITS_PER_PLAYER,
-              SEEDS_PER_PIT, LEVEL);
+          game = new BoardImpl(openingPlayer, pitsPerPlayer,
+              seedsPerPit, level);
 
           if (game.getOpeningPlayer() == Player.MACHINE) {
             machineMove();
@@ -269,8 +267,8 @@ public final class Shell {
    */
   private static void machineMove() {
     game = game.machineMove();
-    System.out.format(UserCommunication.MACHINE_MOVE, game.sourcePitOfLastMove(),
-        game.targetPitOfLastMove());
+    System.out.format(UserCommunication.MACHINE_MOVE,
+        game.sourcePitOfLastMove(), game.targetPitOfLastMove());
 
     while (game.getOpeningPlayer() == Player.MACHINE && !game.isGameOver()) {
       System.out.println(UserCommunication.HUMAN_MISS);
@@ -283,13 +281,16 @@ public final class Shell {
    * message on the screen.
    */
   private static void getWinner() {
-    if (game.getWinner() == null) {
-      System.out.format(UserCommunication.STALEMATE, game.getSeedsOfPlayer(Player.HUMAN));
+    if (game.getWinner() == Player.NONE) {
+      System.out.format(UserCommunication.STALEMATE,
+          game.getSeedsOfPlayer(Player.HUMAN));
     } else if (game.getWinner() == Player.HUMAN) {
-      System.out.format(UserCommunication.WIN, game.getSeedsOfPlayer(Player.HUMAN),
+      System.out.format(UserCommunication.WIN,
+          game.getSeedsOfPlayer(Player.HUMAN),
           game.getSeedsOfPlayer(Player.MACHINE));
     } else {
-      System.out.format(UserCommunication.LOOSE, game.getSeedsOfPlayer(Player.MACHINE),
+      System.out.format(UserCommunication.LOOSE,
+          game.getSeedsOfPlayer(Player.MACHINE),
           game.getSeedsOfPlayer(Player.HUMAN));
     }
   }

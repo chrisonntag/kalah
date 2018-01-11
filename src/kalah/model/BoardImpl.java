@@ -4,70 +4,91 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import kalah.controller.Node;
+import kalah.minimax.Node;
 import kalah.model.players.Player;
 import kalah.exceptions.IllegalMoveException;
 
-// TODO: work with zero indexed-pits! Check!
+// TODO: work with zero indexed-pits!
+
+/**
+ * {@inheritDoc}
+ */
 public class BoardImpl implements Board {
-
-  /**
-   * {@inheritDoc}
-   */
-  private int DEFAULT_PITS_PER_PLAYER = 6;
-
-  /**
-   * {@inheritDoc}
-   */
-  private int DEFAULT_SEEDS_PER_PIT = 3;
 
   private Player openingPlayer;
   private int level;
+  private int currentPitsPerPlayer;
+  private int currentSeedsPerPit;
 
-  // TODO: Check switching to minimal int[][] array.
   private Pit[][] pits;
 
   private int sourcePitOfLastMove = 0;
   private int targetPitOfLastMove = 0;
 
+  /**
+   * Instantiates a new {@link BoardImpl} object.
+   *
+   * @param openingPlayer
+   * @param pitsCount
+   * @param seedsCount
+   * @param level
+   * @param pits
+   * @param sourcePit
+   * @param targetPit
+   */
   private BoardImpl(Player openingPlayer, int pitsCount, int seedsCount,
       int level, Pit[][] pits, int sourcePit, int targetPit) {
     this.openingPlayer = openingPlayer;
     this.level = level;
-    DEFAULT_PITS_PER_PLAYER = pitsCount;
-    DEFAULT_SEEDS_PER_PIT = seedsCount;
+    this.currentPitsPerPlayer = pitsCount;
+    this.currentSeedsPerPit = seedsCount;
     this.pits = pits;
     this.sourcePitOfLastMove = sourcePit;
     this.targetPitOfLastMove = targetPit;
   }
 
+  /**
+   * Instantiates a new {@link BoardImpl} object.
+   *
+   * @param openingPlayer The player who opens the game.
+   * @param pitsCount The number of pits per player on the object.
+   * @param seedsCount The number of seeds per player on the object.
+   * @param level The desired difficulty level of the game which simultaneously
+   * is the maximum depth of the calculated score tree of the machine.
+   */
   public BoardImpl(Player openingPlayer, int pitsCount,
       int seedsCount, int level) {
-    // TODO: class secret?
     this.openingPlayer = openingPlayer;
     this.level = level;
-    DEFAULT_PITS_PER_PLAYER = pitsCount;
-    DEFAULT_SEEDS_PER_PIT = seedsCount;
-    this.pits = new Pit[2][DEFAULT_PITS_PER_PLAYER + 1];
+    this.currentPitsPerPlayer = pitsCount;
+    this.currentSeedsPerPit = seedsCount;
+    this.pits = new Pit[2][pitsCount + 1];
 
     populateBoard();
   }
 
+  /**
+   * Initializes the two dimensional {@link #pits} array with the desired number
+   * of initial seeds per pit. The array itself doesn't hold the seeds but
+   * rather objects of {@link Pit} in order to encapsulate all pit-related
+   * information like ownership, the number of seeds and whether the pit is a
+   * players store or not in one extra class.
+   */
   private void populateBoard() {
     for (int i = 0; i < 2; i++) {
-      for (int j = 0; j < DEFAULT_PITS_PER_PLAYER + 1; j++) {
+      for (int j = 0; j < getPitsPerPlayer() + 1; j++) {
         if (i == 0 && j == 0) {
           // Create the store for machine player.
           this.pits[i][j] = new Pit(Player.MACHINE, true);
-        } else if (i == 1 && j == DEFAULT_PITS_PER_PLAYER) {
+        } else if (i == 1 && j == getPitsPerPlayer()) {
           // Create the store for human player.
           this.pits[i][j] = new Pit(Player.HUMAN, true);
         } else if (i == 0) {
           // Create the pits for machine player.
-          this.pits[i][j] = new Pit(Player.MACHINE, DEFAULT_SEEDS_PER_PIT);
+          this.pits[i][j] = new Pit(Player.MACHINE, getSeedsPerPit());
         } else {
           // Create the pits for human player.
-          this.pits[i][j] = new Pit(Player.HUMAN, DEFAULT_SEEDS_PER_PIT);
+          this.pits[i][j] = new Pit(Player.HUMAN, getSeedsPerPit());
         }
       }
     }
@@ -110,15 +131,14 @@ public class BoardImpl implements Board {
     } else if (getOpeningPlayer() != Player.HUMAN) {
       throw new IllegalMoveException("Error! It's not your turn.");
     } else {
-      try {
+      if (pit <= (getPitsPerPlayer() + 1) * 2) {
         if (getSeeds(pit) == 0 || getPit(pit).isStore()
             || getPit(pit).getOwner() != getOpeningPlayer()) {
-          // TODO: null is an undeclared state
-          // TODO: --> better return IllegalStateException
-          return null;
+          throw new IllegalStateException();
         }
-      } catch (ArrayIndexOutOfBoundsException e) {
-        throw new IllegalArgumentException("Error! The pit is not on the grid!");
+      } else {
+        throw
+            new IllegalArgumentException("Error! The pit is not on the grid!");
       }
     }
 
@@ -131,6 +151,13 @@ public class BoardImpl implements Board {
     return board;
   }
 
+  /**
+   * Takes a pit number as an input and sows all seeds in it counter-clockwise
+   * to the following pits on this board with one new seed per pit. If the
+   * last pit in this process is empty, the pits opposite seeds plus the new
+   *
+   * @param pit The pit number the player takes.
+   */
   private void sowSeeds(int pit) {
     int seeds = getSeeds(pit);
     getPit(pit).setSeeds(0);
@@ -152,20 +179,21 @@ public class BoardImpl implements Board {
     sourcePitOfLastMove = pit;
     targetPitOfLastMove = normalizePitNum(pitCount);
 
-    // Check if catching is possible and update the pits.
+    // Check if catching is possible.
     Pit targetPit = getPit(targetPitOfLastMove());
     Pit opposingPit = getPit(getOpposingPitNum(targetPitOfLastMove()));
     if (!targetPit.isStore() && targetPit.getOwner() == getOpeningPlayer()
         && opposingPit.getSeeds() > 0 && targetPit.getSeeds() == 1) {
+      // Update the seeds in the corresponding pits.
       int holdingSeeds = opposingPit.getSeeds() + targetPit.getSeeds();
       opposingPit.setSeeds(0);
       targetPit.setSeeds(0);
 
       // Decide which player gets the captured seeds.
       if (getOpeningPlayer() == Player.HUMAN) {
-        getPit(DEFAULT_PITS_PER_PLAYER + 1).addSeeds(holdingSeeds);
+        getPit(getPitsPerPlayer() + 1).addSeeds(holdingSeeds);
       } else {
-        getPit((DEFAULT_PITS_PER_PLAYER + 1) * 2).addSeeds(holdingSeeds);
+        getPit((getPitsPerPlayer() + 1) * 2).addSeeds(holdingSeeds);
       }
     }
   }
@@ -180,11 +208,17 @@ public class BoardImpl implements Board {
   private int normalizePitNum(int pit) {
     // Subtract one and add it again after the modulo
     // operation in order to start at number one.
-    return (pit - 1) % ((DEFAULT_PITS_PER_PLAYER + 1) * 2) + 1;
+    return (pit - 1) % ((getPitsPerPlayer() + 1) * 2) + 1;
   }
 
+  /**
+   * Calculates the pit number of the opposing pit for a given number.
+   *
+   * @param pit The pit number whose opposing pit number should be calculated.
+   * @return The opposing pit number.
+   */
   private int getOpposingPitNum(int pit) {
-    int maxPitNum = (DEFAULT_PITS_PER_PLAYER + 1) * 2;
+    int maxPitNum = (getPitsPerPlayer() + 1) * 2;
     if (pit == maxPitNum) {
       return maxPitNum / 2;
     } else if (pit == maxPitNum / 2) {
@@ -245,7 +279,6 @@ public class BoardImpl implements Board {
     } else {
       // Create a new sub-tree.
       Node root = new Node(this.clone(), this.calcScore(depth), depth);
-      //System.out.println("\t\t\t\tR: " + root.getScore());
 
       // TODO: Check role of opening and next player.
       List<Board> possibleStates =
@@ -253,16 +286,22 @@ public class BoardImpl implements Board {
       for (Board board : possibleStates) {
         Node child = ((BoardImpl) board).constructTree(depth + 1);
         root.addChild(child);
-        //System.out.println("\tC: " + child.getScore());
       }
       return root;
     }
   }
 
+  /**
+   * Generates a list of all possible game states for a given player which can
+   * be reached within one move on the current board.
+   *
+   * @param player The player for which to generate game states.
+   * @return A list of possible game states.
+   */
   private List<Board> getPossibleGameStates(Player player) {
     // TODO: is ArrayList useful here?
     List<Board> gameStates = new ArrayList<>();
-    for (int pitNum : getPlayerPits(player)) {
+    for (int pitNum : getSourcePits(player)) {
       if (getPit(pitNum).getSeeds() != 0) {
         BoardImpl state = this.clone();
         state.sowSeeds(pitNum);
@@ -275,12 +314,30 @@ public class BoardImpl implements Board {
     return gameStates;
   }
 
+  /**
+   * Calculates a local score for this board in order to appraise the current
+   * situation from the perspective of the machine. Following part scores are
+   * being considered to evaluate the value of the local score.
+   * calculated by following part-scores:
+   * <ul>
+   *   <li>Score S, which compares the seeds in each players store.</li>
+   *   <li>Score C, which evaluates the number of opposing seeds which can be
+   *   captured in this move.</li>
+   *   <li>Score P, which counts the number of empty pits whose opposing
+   *   opposite pits contain at least twice the number of seeds as initial.</li>
+   *   <li>Score V, which evaluates if a move leads to a victory
+   *   immediately.</li>
+   * </ul>
+   *
+   * @param depth The boards depth in the evaluation tree.
+   * @return The calculated score.
+   */
   private double calcScore(int depth) {
     // TODO: shorten this method.
 
     // Evaluate seeds in the stores.
-    int machineStore = (DEFAULT_PITS_PER_PLAYER + 1) * 2;
-    int humanStore = DEFAULT_PITS_PER_PLAYER + 1;
+    int machineStore = (getPitsPerPlayer() + 1) * 2;
+    int humanStore = getPitsPerPlayer() + 1;
 
     double scoreS = getSeeds(machineStore) - 1.5 * getSeeds(humanStore);
 
@@ -291,7 +348,6 @@ public class BoardImpl implements Board {
     Set<Integer> targetPitsMachine =
         getPossibleTargetPits(Player.MACHINE);
 
-    // TODO: primitive downcast Integer list to int?
     // Loops through all possible target pits of the human in order to find
     // catchable seeds of the machine.
     for (int target : targetPitsHuman) {
@@ -315,10 +371,10 @@ public class BoardImpl implements Board {
 
     // Evaluate the number of empty pits whose opposing opposite
     // pits contain at least twice the number of seeds as initial
-    // per hollow at game start.
+    // per pit at the game start.
     double emptyHumanPits = 0;
     double emptyMachinePits = 0;
-    for (int pitNum : getPlayerPits(Player.HUMAN)) {
+    for (int pitNum : getSourcePits(Player.HUMAN)) {
       if (getPit(pitNum).getSeeds() == 0
           && getPit(getOpposingPitNum(pitNum)).getSeeds()
           >= 2 * getSeedsPerPit()) {
@@ -326,7 +382,7 @@ public class BoardImpl implements Board {
       }
     }
 
-    for (int pitNum : getPlayerPits(Player.MACHINE)) {
+    for (int pitNum : getSourcePits(Player.MACHINE)) {
       if (getPit(pitNum).getSeeds() == 0
           && getPit(getOpposingPitNum(pitNum)).getSeeds()
           >= 2 * getSeedsPerPit()) {
@@ -355,16 +411,21 @@ public class BoardImpl implements Board {
     return 3 * scoreS + scoreC + scoreP + scoreV;
   }
 
-  private List<Integer> getPlayerPits(Player player) {
+  /**
+   * Gets a list of game pit numbers a given player owns (no stores).
+   *
+   * @param player The player whose game pit numbers should be returned.
+   * @return A list of game pits for a given player.
+   */
+  private List<Integer> getSourcePits(Player player) {
     List<Integer> playerPits = new ArrayList<>();
     int firstPitNum = 1;
     int lastPitNum = getPitsPerPlayer();
     if (player == Player.MACHINE) {
-      firstPitNum = getPitsPerPlayer() + 2; // TODO: magic number
+      firstPitNum = getPitsPerPlayer() + 2;
       lastPitNum = getPitsPerPlayer() * 2 + 1;
     }
 
-    // TODO: magic number
     for (int i = firstPitNum; i <= lastPitNum; i++) {
       playerPits.add(i);
     }
@@ -384,7 +445,7 @@ public class BoardImpl implements Board {
   private Set<Integer> getPossibleTargetPits(Player player) {
     Set<Integer> targetPitNums = new HashSet<>();
 
-    for (int pitNum : getPlayerPits(player)) {
+    for (int pitNum : getSourcePits(player)) {
       Pit sourcePit = getPit(pitNum);
       if (sourcePit.getSeeds() != 0) {
         int targetPitNum = normalizePitNum(pitNum + sourcePit.getSeeds());
@@ -415,7 +476,7 @@ public class BoardImpl implements Board {
 
     // TODO: Magic number: Set HUMAN_ROW and MACHINE_ROW
     for (int i = 0; i < 2; i++) {
-      for (int j = 0; j <= DEFAULT_PITS_PER_PLAYER; j++) {
+      for (int j = 0; j <= getPitsPerPlayer(); j++) {
         // Check if a players row only contains empty pits.
         if (!this.pits[i][j].isStore() && this.pits[i][j].getSeeds() > 0) {
           if (i == 0) {
@@ -443,7 +504,7 @@ public class BoardImpl implements Board {
         < getSeedsOfPlayer(Player.HUMAN)) {
       return Player.HUMAN;
     } else {
-      return null;
+      return Player.NONE;
     }
   }
 
@@ -497,7 +558,7 @@ public class BoardImpl implements Board {
    */
   @Override
   public int getPitsPerPlayer() {
-    return DEFAULT_PITS_PER_PLAYER;
+    return currentPitsPerPlayer;
   }
 
   /**
@@ -505,7 +566,7 @@ public class BoardImpl implements Board {
    */
   @Override
   public int getSeedsPerPit() {
-    return DEFAULT_SEEDS_PER_PIT;
+    return currentSeedsPerPit;
   }
 
   /**
@@ -535,91 +596,19 @@ public class BoardImpl implements Board {
   public BoardImpl clone() {
     // TODO: use Arrays.copy
     // TODO: use super.clone()
-    Pit[][] newPits = new Pit[2][this.DEFAULT_PITS_PER_PLAYER + 1];
+    Pit[][] newPits = new Pit[2][this.getPitsPerPlayer() + 1];
 
     for (int i = 0; i < 2; i++) {
-      for (int j = 0; j < this.DEFAULT_PITS_PER_PLAYER + 1; j++) {
+      for (int j = 0; j < this.getPitsPerPlayer() + 1; j++) {
         newPits[i][j] = this.pits[i][j].clone();
       }
     }
 
-    return new BoardImpl(this.getOpeningPlayer(), this.DEFAULT_PITS_PER_PLAYER,
-        this.DEFAULT_SEEDS_PER_PIT, this.level, newPits, sourcePitOfLastMove(),
+    return new BoardImpl(this.getOpeningPlayer(), this.getPitsPerPlayer(),
+        this.getSeedsPerPit(), this.level, newPits, sourcePitOfLastMove(),
         targetPitOfLastMove());
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  /*
-  @Override
-  public String toString() {
-    List<Integer> decimalPlaces = new LinkedList<>();
-    StringBuilder upperRow = new StringBuilder();
-    StringBuilder lowerRow = new StringBuilder();
-
-    for (int j = 1; j < getPitsPerPlayer() + 1; j++) {
-      // Evaluate maximum number of decimal places.
-      int maxDecPlaces = 1;
-
-      for (int i = 0; i < this.pits.length; i++) {
-        if (i == 1) {
-          if (this.pits[i][j - 1].toString().length() > maxDecPlaces) {
-            maxDecPlaces = this.pits[i][j - 1].toString().length();
-          }
-        } else {
-          if (this.pits[i][j].toString().length() > maxDecPlaces) {
-            maxDecPlaces = this.pits[i][j].toString().length();
-          }
-        }
-      }
-
-      decimalPlaces.add(maxDecPlaces);
-    }
-
-    int lowerRowLeftMargin = 0;
-    for (int j = 0; j < getPitsPerPlayer() + 1; j++) {
-      for (int i = 0; i < this.pits.length; i++) {
-        int maxDecPlaces = 0;
-        if (j == 0 && i == 0) {
-          lowerRowLeftMargin = this.pits[i][j].toString().length() + 1;
-        } else if (j != getPitsPerPlayer()) {
-          if (j > 0 && i == 0) {
-            maxDecPlaces = decimalPlaces.get(j - 1);
-          } else {
-            maxDecPlaces = decimalPlaces.get(j);
-          }
-        }
-        StringBuilder pit = new StringBuilder();
-        int pitLength = this.pits[i][j].toString().length();
-
-        if (pitLength < maxDecPlaces) {
-          for (int k = 0; k < maxDecPlaces - pitLength; k++) {
-            pit.append(" ");
-          }
-        }
-
-        pit.append(this.pits[i][j].toString());
-        if (j != getPitsPerPlayer()) {
-          pit.append(" ");
-        }
-
-        if (i == 0) {
-          upperRow.append(pit);
-        } else {
-          lowerRow.append(pit);
-        }
-      }
-    }
-
-    for (int i = 0; i < lowerRowLeftMargin; i++) {
-      lowerRow.insert(0, " ");
-    }
-    upperRow.append("\n");
-
-    return upperRow.toString() + lowerRow.toString();
-  }
-*/
   /**
    * {@inheritDoc}
    */
@@ -635,14 +624,10 @@ public class BoardImpl implements Board {
     }
     StringBuilder upperRow = new StringBuilder();
     StringBuilder lowerRow = new StringBuilder();
-    int lowerRowMargin = 2;
     for (int i = 0; i < this.pits.length; i++) {
       for (int j = 0; j < this.pits[i].length; j++) {
-        if (j == 0 && i == 0) {
-          lowerRowMargin = this.pits[i][j].toString().length() + 1;
-        }
-
-        String pit = String.format("%" + maxDecimalNum + "d", this.pits[i][j].getSeeds());
+        String pit = String.format("%" + maxDecimalNum + "d",
+            this.pits[i][j].getSeeds());
         if (i == 0) {
           upperRow.append(pit);
           if (j < getPitsPerPlayer()) {
@@ -656,11 +641,13 @@ public class BoardImpl implements Board {
         }
       }
     }
-
+    int lowerRowMargin = this.pits[0][0].toString().length()
+        + this.pits[1][0].toString().length();
     for (int i = 0; i < lowerRowMargin; i++) {
       lowerRow.insert(0, " ");
     }
-    return upperRow.toString().trim() + "\n" + lowerRow.toString();
+
+    return upperRow.toString() + "\n" + lowerRow.toString();
   }
 
 }

@@ -1,16 +1,24 @@
 package kalah.model.players;
 
 /**
- * Represents a player which can be either MACHINE, HUMAN or NONE to return
- * in case of an error.
+ * Represents a player in the game "Kalah".
  */
 public enum Player {
 
+  /**
+   * The machine player who is fully controlled by the game.
+   */
   MACHINE,
-  HUMAN,
-  NONE;
 
-  // TODO: Implement getMaxPitNum and getMinPitNum methods ?
+  /**
+   * The human player who represents the user of this game.
+   */
+  HUMAN,
+
+  /**
+   * A dummy player to return in case of an error.
+   */
+  NONE;
 
   /**
    * Takes a given Player and returns it's opponent provided that there
@@ -23,7 +31,7 @@ public enum Player {
     // TODO: Check location of method (static in Player?)
     if (player == HUMAN) {
       return MACHINE;
-    } else if (player == MACHINE){
+    } else if (player == MACHINE) {
       return HUMAN;
     } else {
       return NONE;

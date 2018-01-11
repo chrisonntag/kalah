@@ -9,7 +9,9 @@ import java.util.Map;
  * should be in this class in order to have a central unit for changes or
  * translation.
  */
-public class UserCommunication {
+public final class UserCommunication {
+
+  private UserCommunication() { }
 
   /**
    * Used if the machine must miss a turn.

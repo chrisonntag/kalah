@@ -1,4 +1,4 @@
-package kalah.controller;
+package kalah.minimax;
 
 import java.util.ArrayList;
 import java.util.List;
