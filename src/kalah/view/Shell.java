@@ -10,12 +10,12 @@ import kalah.exceptions.IllegalMoveException;
 import kalah.model.Board;
 import kalah.model.BoardImpl;
 import kalah.model.players.Player;
-import kalah.util.Utility;
+import kalah.util.UserCommunication;
 
 /**
  * The Shell class represents a basic command line user interface, providing
  * commands for interacting with the Game "Kalah". A list of error codes and
- * it's associated messages can be found in the {@link Utility} class.
+ * it's associated messages can be found in the {@link UserCommunication} class.
  */
 // TODO: l? 4er Einrückung verwenden
 public final class Shell {
@@ -127,7 +127,7 @@ public final class Shell {
               getWinner();
             }
           } else {
-            System.out.println(Utility.MACHINE_MISS);
+            System.out.println(UserCommunication.MACHINE_MISS);
           }
         } else {
           System.out.println(getError(300));
@@ -256,11 +256,11 @@ public final class Shell {
    * string in order to work in text based applications as well as be reusable
    * in applications with a graphical user interface.
    *
-   * @param code The error code as stated in {@link Utility}.
+   * @param code The error code as stated in {@link UserCommunication}.
    * @return The error message.
    */
   private static String getError(int code) {
-    return "Error! " + Utility.ERROR_MESSAGES.get(code);
+    return "Error! " + UserCommunication.ERROR_MESSAGES.get(code);
   }
 
   /**
@@ -269,11 +269,11 @@ public final class Shell {
    */
   private static void machineMove() {
     game = game.machineMove();
-    System.out.format(Utility.MACHINE_MOVE, game.sourcePitOfLastMove(),
+    System.out.format(UserCommunication.MACHINE_MOVE, game.sourcePitOfLastMove(),
         game.targetPitOfLastMove());
 
     while (game.getOpeningPlayer() == Player.MACHINE && !game.isGameOver()) {
-      System.out.println(Utility.HUMAN_MISS);
+      System.out.println(UserCommunication.HUMAN_MISS);
       machineMove();
     }
   }
@@ -284,12 +284,12 @@ public final class Shell {
    */
   private static void getWinner() {
     if (game.getWinner() == null) {
-      System.out.format(Utility.STALEMATE, game.getSeedsOfPlayer(Player.HUMAN));
+      System.out.format(UserCommunication.STALEMATE, game.getSeedsOfPlayer(Player.HUMAN));
     } else if (game.getWinner() == Player.HUMAN) {
-      System.out.format(Utility.WIN, game.getSeedsOfPlayer(Player.HUMAN),
+      System.out.format(UserCommunication.WIN, game.getSeedsOfPlayer(Player.HUMAN),
           game.getSeedsOfPlayer(Player.MACHINE));
     } else {
-      System.out.format(Utility.LOOSE, game.getSeedsOfPlayer(Player.MACHINE),
+      System.out.format(UserCommunication.LOOSE, game.getSeedsOfPlayer(Player.MACHINE),
           game.getSeedsOfPlayer(Player.HUMAN));
     }
   }

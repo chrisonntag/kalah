@@ -9,8 +9,7 @@ import java.util.Map;
  * should be in this class in order to have a central unit for changes or
  * translation.
  */
-// TODO: Rename class to UserCommunication
-public class Utility {
+public class UserCommunication {
 
   /**
    * Used if the machine must miss a turn.
