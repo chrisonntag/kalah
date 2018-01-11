@@ -120,6 +120,9 @@ public final class Shell {
             getWinner();
           } else if (game.getOpeningPlayer() == Player.MACHINE) {
             machineMove();
+            if (game.isGameOver()) {
+              getWinner();
+            }
           } else {
             System.out.println(Utility.MACHINE_MISS);
           }
@@ -128,6 +131,7 @@ public final class Shell {
         }
         break;
       case 'S':
+        // TODO: check switch
         if (game != null) {
           Player lastPlayer = game.getOpeningPlayer();
           OPENING_PLAYER = Player.getOpponent(lastPlayer);
@@ -263,16 +267,10 @@ public final class Shell {
     System.out.format(Utility.MACHINE_MOVE, game.sourcePitOfLastMove(),
         game.targetPitOfLastMove());
 
-    // TODO: redundant opening==machine check?
-    if (game.getOpeningPlayer() == Player.MACHINE) {
-      while (game.getOpeningPlayer() == Player.MACHINE && !game.isGameOver()) {
-        System.out.println(Utility.HUMAN_MISS);
-        machineMove();
-      }
-    }
-
-    if (game.isGameOver()) {
-      getWinner();
+    // TODO: redundant opening==machine check? Check!
+    while (game.getOpeningPlayer() == Player.MACHINE && !game.isGameOver()) {
+      System.out.println(Utility.HUMAN_MISS);
+      machineMove();
     }
   }
 
