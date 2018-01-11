@@ -6,13 +6,13 @@ package kalah.exceptions;
  */
 public class IllegalMoveException extends RuntimeException {
 
-  /**
-   * Instantiates a {@link IllegalMoveException}.
-   *
-   * @param msg The exception message.
-   */
-  public IllegalMoveException(String msg) {
-    super(msg);
-  }
+    /**
+     * Instantiates a {@link IllegalMoveException}.
+     *
+     * @param msg The exception message.
+     */
+    public IllegalMoveException(String msg) {
+        super(msg);
+    }
 
 }

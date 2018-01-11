@@ -1,1 +1,166 @@
-TEST
+kalah> m 3
+Error! No game started yet.
+kalah> l 5
+Error! No game started yet.
+kalah> n 4 2
+kalah> p
+0 2 2 2 2
+  2 2 2 2 0
+kalah> m 2
+Machine chose pit 9 with seeds reaching pit 1.
+kalah> p
+1 0 2 2 2
+  3 0 3 3 0
+kalah> l 7
+kalah> p
+1 0 2 2 2
+  3 0 3 3 0
+kalah> m 1
+Machine chose pit 8 with seeds reaching pit 10.
+You must miss a turn.
+Machine chose pit 6 with seeds reaching pit 8.
+kalah> p
+4 1 0 3 0
+  0 0 4 4 0
+kalah> n 4 2
+kalah> p
+0 2 2 2 2
+  2 2 2 2 0
+kalah> m 3
+Machine must miss a turn.
+kalah> p
+0 2 2 2 2
+  2 2 0 3 1
+kalah> m 1
+Machine chose pit 8 with seeds reaching pit 10.
+You must miss a turn.
+Machine chose pit 6 with seeds reaching pit 8.
+kalah> p
+5 3 0 1 0
+  0 0 0 3 4
+kalah> m 4
+Sorry! Machine wins with 11 seeds versus your 5.
+kalah> p
+5 3 0 2 1
+  0 0 0 0 5
+kalah> m 0
+Error! Parameter must be positive and not zero.
+kalah> m 1
+Error! The game is already over!
+kalah> level 8
+Error! Level must be between 1 and 7
+kalah> level 4
+kalah> m a
+Error! All arguments must be numbers.
+kalah> new 6 3
+kalah> p
+0 3 3 3 3 3 3
+  3 3 3 3 3 3 0
+kalah> m 4
+Machine must miss a turn.
+kalah> p
+0 3 3 3 3 3 3
+  3 3 3 0 4 4 1
+kalah> n a
+Error! Wrong number of arguments: +2 numbers expected.
+kalah> n a b
+Error! All arguments must be numbers.
+kalah> n 2 4
+kalah> m 2 3
+Error! Wrong number of arguments: +1 integers expected.
+kalah> p
+0 4 4
+  4 4 0
+kalah> m 1
+Machine chose pit 4 with seeds reaching pit 4.
+kalah> p
+8 6 0
+  1 0 1
+kalah> n 2 4
+kalah> switch
+Machine chose pit 4 with seeds reaching pit 2.
+kalah> p
+1 5 0
+  5 5 0
+kalah> m 1
+Machine chose pit 4 with seeds reaching pit 5.
+kalah> p
+1 1 0
+  0 6 8
+kalah> m 1
+Error! Invalid move!
+kalah> l a
+Error! The level must be a number.
+kalah> new 6 12
+kalah> p
+ 0 12 12 12 12 12 12
+   12 12 12 12 12 12  0
+kalah>
+Error! No valid command.
+Mancala/Kalah – A game written in Java
+
+	new <p> <s> 		Start a new game with <p> pits and <s> seeds per pit.
+	level <i> 			Set the level 1-7.
+	move <p> 				Moves the seeds of pit <p>.
+	switch					Starts a new game and lets the second player open the game.
+	print						Prints out the board.
+	help						Shows this help message.
+	quit						Exit the program.
+kalah> l
+Error! You must specify a level.
+kalah> l 3
+kalah> new 4 100
+kalah> p
+  0 100 100 100 100
+    100 100 100 100   0
+kalah> m 1
+Machine chose pit 7 with seeds reaching pit 10.
+You must miss a turn.
+Machine chose pit 6 with seeds reaching pit 2.
+kalah> p
+ 27 138 138  26  13
+     37 138 136 136  11
+kalah> l 7
+kalah> m 1
+Machine chose pit 8 with seeds reaching pit 6.
+kalah> p
+ 43 158  15  45  33
+     20 159 156 156  15
+kalah> n 15 1
+kalah> p
+0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0
+kalah> m 15
+Machine must miss a turn.
+kalah> m 14
+Machine chose pit 31 with seeds reaching pit 32.
+You must miss a turn.
+Machine chose pit 30 with seeds reaching pit 31.
+kalah> p
+3 0 0 1 1 1 1 1 1 1 1 1 1 1 1 0
+  0 1 1 1 1 1 1 1 1 1 1 1 1 0 0 3
+kalah> n 20 1
+kalah> m 20
+Machine must miss a turn.
+kalah> m 19
+Machine chose pit 41 with seeds reaching pit 42.
+You must miss a turn.
+Machine chose pit 40 with seeds reaching pit 41.
+kalah> n 25 1
+kalah> m 25
+Machine must miss a turn.
+kalah> m 24
+Machine chose pit 51 with seeds reaching pit 52.
+You must miss a turn.
+Machine chose pit 50 with seeds reaching pit 51.
+kalah> n 30 1
+kalah> m 30
+Machine must miss a turn.
+kalah> m 29
+Machine chose pit 61 with seeds reaching pit 62.
+You must miss a turn.
+Machine chose pit 60 with seeds reaching pit 61.
+kalah> p
+3 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0
+  0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 3
+kalah> quit
