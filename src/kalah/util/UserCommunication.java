@@ -76,7 +76,6 @@ public class UserCommunication {
           put(301, "The game is already over!");
           put(302, "No valid command.");
 
-          // game logic
           put(400, "It's not your turn.");
           put(401, "The pit is not on the grid!");
           put(402, "Invalid move!");

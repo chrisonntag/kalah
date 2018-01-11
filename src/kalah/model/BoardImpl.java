@@ -215,7 +215,7 @@ public class BoardImpl implements Board {
     if (root.getChildren() != null) {
       StringBuilder sb = new StringBuilder();
       for (Node node : root.getChildren()) {
-        for (int i = 1; i < node.getLevel(); i++) {
+        for (int i = 1; i < node.getDepth(); i++) {
           sb.append("  ");
         }
         sb.append(node.getBoard().sourcePitOfLastMove());

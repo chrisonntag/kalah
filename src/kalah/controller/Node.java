@@ -5,73 +5,125 @@ import java.util.List;
 import kalah.model.Board;
 import kalah.model.players.Player;
 
+/**
+ * Represents a node in a tree with up to n children. The {@link Node} itself
+ * holds a {@link #board}, it's calculated {@link #localScore} and a
+ * main {@link #score} which is the sum of it's maximum or minimum child
+ * and the {@link #localScore}.
+ */
 public class Node {
 
   private double score;
   private double localScore;
-  private int level;
+  private int depth;
   private Board board;
   private List<Node> children = new ArrayList<>();
 
-  public Node(Board board, List<Node> children, double score, int level) {
+  /**
+   * Instantiates a new {@link Node} object.
+   *
+   * @param board The game board object.
+   * @param children A list of children which will be set for this node.
+   * @param score The calculated score for this board.
+   * @param depth The current depth of the node in the tree.
+   */
+  public Node(Board board, List<Node> children, double score, int depth) {
+    // TODO: is this constructor needed?
     this.board = board;
     this.score = score;
     this.localScore = score;
     this.children = children;
-    this.level = level;
+    this.depth = depth;
   }
 
-  public Node(Board board, double score, int level) {
+  /**
+   * Instantiates a new {@link Node} object.
+   *
+   * @param board The game board object.
+   * @param score The calculated score for this board.
+   * @param depth The current depth of the node in the tree.
+   */
+  public Node(Board board, double score, int depth) {
     this.board = board;
     this.score = score;
     this.localScore = score;
-    this.level = level;
+    this.depth = depth;
   }
 
+  /**
+   * Gets this nodes children.
+   *
+   * @return A list of this nodes children.
+   */
   public List<Node> getChildren() {
     return this.children;
   }
 
-  public void setChildren(List<Node> children) {
-    this.children = children;
-  }
-
+  /**
+   * Adds a single {@link Node} to this nodes children.
+   *
+   * @param node The node which should be set as a child.
+   */
   public void addChild(Node node) {
     this.children.add(node);
   }
 
+  /**
+   * Gets this nodes total {@link #score}, which is the sum of the
+   * {@link #localScore} and the score of the maximum/minimum child of
+   * this node.
+   *
+   * @return The total score of this node.
+   */
   public double getScore() {
     return score;
   }
 
+  /**
+   * Gets the {@link #localScore} of this node as calculated in the Board
+   * implementation.
+   *
+   * @return The local score of this node.
+   */
   public double getLocalScore() {
     return localScore;
   }
 
+  /**
+   * Sets the total {@link #score}, which is the sum of the
+   * {@link #localScore} and the score of the maximum/minimum child of
+   * this node.
+   *
+   * @param score The score value which should be set.
+   */
   public void setScore(double score) {
     this.score = score;
   }
 
-  public int getLevel() {
-    return level;
+  /**
+   * Gets the {@link #depth} of the node in the whole tree.
+   *
+   * @return The depth of the node.
+   */
+  public int getDepth() {
+    return depth;
   }
 
-  public void setLevel(int level) {
-    this.level = level;
-  }
-
+  /**
+   * Gets the {@link #board} object of this node.
+   *
+   * @return The Board object.
+   */
   public Board getBoard() {
     return board;
   }
 
-  public void setBoard(Board board) {
-    this.board = board;
-  }
-
   /**
-   * Update score on the min max tree by adding the highest or lowest score of
-   * the children or a node to the local score. If the move by the child node
-   * is a human move the lowest is added, the highest otherwise.
+   * Update the total {@link #score} of this node by adding the maximum or
+   * minimum score of it's children to the {@link #localScore} depending on
+   * which player is the current player in the child node. If the move on a
+   * children's node is a human move the minimum is added, otherwise
+   * the maximum.
    */
   public void updateScore() {
     if (this.getChildren() != null) {
@@ -92,6 +144,12 @@ public class Node {
     }
   }
 
+  /**
+   * Checks each of this nodes children for the minimum, depending on it's
+   * total {@link #score}.
+   *
+   * @return The minimum child's node.
+   */
   public Node getMinChild() {
     List<Node> children = getChildren();
     Node minChild = children.get(0);
@@ -104,6 +162,12 @@ public class Node {
     return minChild;
   }
 
+  /**
+   * Checks each of this nodes children for the maximum, depending on it's
+   * total {@link #score}.
+   *
+   * @return The maximum child's node.
+   */
   public Node getMaxChild() {
     List<Node> children = getChildren();
     Node maxChild = children.get(0);
@@ -118,7 +182,8 @@ public class Node {
 
   @Override
   public String toString() {
-    return "Level: " + level + ", Score: " + score;
+    // TODO: remove before production.
+    return "Level: " + depth + ", Score: " + score;
   }
 
 }
