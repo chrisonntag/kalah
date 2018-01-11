@@ -133,11 +133,14 @@ public final class Shell {
       case 'S':
         // TODO: check switch
         if (game != null) {
-          Player lastPlayer = game.getOpeningPlayer();
-          OPENING_PLAYER = Player.getOpponent(lastPlayer);
+          OPENING_PLAYER = Player.getOpponent(OPENING_PLAYER);
 
           game = new BoardImpl(OPENING_PLAYER, PITS_PER_PLAYER,
               SEEDS_PER_PIT, LEVEL);
+
+          if (game.getOpeningPlayer() == Player.MACHINE) {
+            machineMove();
+          }
         } else {
           System.out.println("Error! No game started yet.");
         }
