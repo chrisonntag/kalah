@@ -8,8 +8,6 @@ import kalah.exceptions.IllegalMoveException;
 import kalah.minimax.Node;
 import kalah.model.players.Player;
 
-// TODO: work with zero indexed-pits!
-
 /**
  * {@inheritDoc}
  */
@@ -125,7 +123,6 @@ public class BoardImpl implements Board {
         BoardImpl board = this.clone();
         board.sowSeeds(pit);
 
-        // TODO: Check role of opening and next player.
         board.openingPlayer = board.next();
 
         return board;
@@ -234,7 +231,6 @@ public class BoardImpl implements Board {
             // Create a new sub-tree.
             Node root = new Node(this.clone(), this.calcScore(depth), depth);
 
-            // TODO: Check role of opening and next player.
             List<Board> possibleStates =
                 getPossibleGameStates(getOpeningPlayer());
             for (Board board : possibleStates) {
@@ -258,7 +254,7 @@ public class BoardImpl implements Board {
             if (getPit(pitNum).getSeeds() != 0) {
                 BoardImpl state = this.clone();
                 state.sowSeeds(pitNum);
-                // TODO: Check role of opening and next player.
+
                 state.openingPlayer = state.next();
                 gameStates.add(state);
             }
@@ -286,8 +282,6 @@ public class BoardImpl implements Board {
      * @return The calculated score.
      */
     private double calcScore(int depth) {
-        // TODO: shorten this method.
-
         // Evaluate seeds in the stores.
         int machineStore = (getPitsPerPlayer() + 1) * 2;
         int humanStore = getPitsPerPlayer() + 1;
@@ -430,7 +424,6 @@ public class BoardImpl implements Board {
         boolean upperRowPitsEmpty = true;
         boolean lowerRowPitsEmpty = true;
 
-        // TODO: Magic number: Set HUMAN_ROW and MACHINE_ROW
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j <= getPitsPerPlayer(); j++) {
                 // Check if a players row only contains empty pits.
@@ -527,7 +520,6 @@ public class BoardImpl implements Board {
      */
     @Override
     public int getSeedsOfPlayer(Player player) {
-        // TODO: Magic number: Set HUMAN_ROW and MACHINE_ROW
         int playerRow = 0;
         if (player == Player.HUMAN) {
             playerRow = 1;

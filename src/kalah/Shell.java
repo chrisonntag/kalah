@@ -17,7 +17,6 @@ import kalah.util.UserCommunication;
  * commands for interacting with the Game "Kalah". A list of error codes and
  * it's associated messages can be found in the {@link UserCommunication} class.
  */
-// TODO: l? 4er Einrückung verwenden
 public final class Shell {
 
     private static Board game = null;

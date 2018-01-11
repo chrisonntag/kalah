@@ -3,8 +3,9 @@ package kalah.model;
 import kalah.model.players.Player;
 
 /**
- * Represents a pit in the "Kalah" game.
- * TODO: erweitern
+ * Represents a pit in the "Kalah" game. This class encapsulates all pit-related
+ * information like ownership, the number of seeds and whether the pit is a
+ * players store or not in one extra class.
  */
 public class Pit implements Cloneable {
 

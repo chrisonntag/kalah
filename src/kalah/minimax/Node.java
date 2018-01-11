@@ -28,7 +28,6 @@ public class Node {
      * @param depth The current depth of the node in the tree.
      */
     public Node(Board board, List<Node> children, double score, int depth) {
-        // TODO: is this constructor needed?
         this.board = board;
         this.score = score;
         this.localScore = score;
