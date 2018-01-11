@@ -97,15 +97,6 @@ kalah> p
    12 12 12 12 12 12  0
 kalah>
 Error! No valid command.
-Mancala/Kalah – A game written in Java
-
-	new <p> <s> 		Start a new game with <p> pits and <s> seeds per pit.
-	level <i> 			Set the level 1-7.
-	move <p> 				Moves the seeds of pit <p>.
-	switch					Starts a new game and lets the second player open the game.
-	print						Prints out the board.
-	help						Shows this help message.
-	quit						Exit the program.
 kalah> l
 Error! You must specify a level.
 kalah> l 3

@@ -109,8 +109,8 @@ public final class Shell {
                         Board board = game.move(args.get("pit"));
 
                         game = board;
-                    } catch (IllegalMoveException |
-                        IllegalArgumentException e) {
+                    } catch (IllegalMoveException
+                        | IllegalArgumentException e) {
                         System.out.println(e.getMessage());
                         break;
                     } catch (IllegalStateException e) {

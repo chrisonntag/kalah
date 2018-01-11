@@ -87,7 +87,7 @@ public class Node {
      * @param score The score value which should be set.
      */
     public void setScore(double score) {
-        score = score;
+        this.score = score;
     }
 
     /**
