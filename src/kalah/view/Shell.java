@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import kalah.exceptions.IllegalMoveException;
 import kalah.model.Board;
@@ -13,8 +14,10 @@ import kalah.util.Utility;
 
 /**
  * The Shell class represents a basic command line user interface, providing
- * commands for multiplying matrices.
+ * commands for interacting with the Game "Kalah". A list of error codes and
+ * it's associated messages can be found in the {@link Utility} class.
  */
+// TODO: l? 4er Einrückung verwenden
 public final class Shell {
 
   private static Board game = null;
@@ -26,15 +29,15 @@ public final class Shell {
   private Shell() { }
 
   /**
-   * This is the main method which instantiates the BufferedReader
-   * accepting user input.
+   * This is the main method which instantiates the Board implementation and
+   * the BufferedReader accepting user input.
    *
-   * @param args          unused.
-   * @throws IOException  thrown on input error.
+   * @param args          These are unused for this application.
+   * @throws IOException  Thrown on input error.
    */
   public static void main(String[] args) throws IOException {
-    BufferedReader reader
-        = new BufferedReader(new InputStreamReader(System.in));
+    BufferedReader reader =
+        new BufferedReader(new InputStreamReader(System.in));
     execute(reader);
   }
 
@@ -58,10 +61,10 @@ public final class Shell {
               quit = true;
             }
           } else {
-            System.out.println("Error! No valid command.");
+            System.out.println(getError(302));
           }
         } else {
-          System.out.println("Error! No valid command.");
+          System.out.println(getError(302));
           showHelp();
         }
 
@@ -77,7 +80,7 @@ public final class Shell {
    * @param args      possible parameters.
    */
   private static boolean evaluateCommand(String command,
-      HashMap<String, Integer> args) {
+      Map<String, Integer> args) {
     boolean quit = false;
     if (args.get("error") != 0) {
       command = "error";
@@ -88,15 +91,15 @@ public final class Shell {
         PITS_PER_PLAYER = args.get("pits");
         SEEDS_PER_PIT = args.get("seeds");
 
-        game = new BoardImpl(OPENING_PLAYER, PITS_PER_PLAYER,
-            SEEDS_PER_PIT, LEVEL);
+        game = new BoardImpl(OPENING_PLAYER, PITS_PER_PLAYER, SEEDS_PER_PIT,
+            LEVEL);
         break;
       case 'L':
         if (game != null) {
           LEVEL = args.get("level");
           game.setLevel(LEVEL);
         } else {
-          System.out.println("Error! No game started yet.");
+          System.out.println(getError(300));
         }
         break;
       case 'M':
@@ -108,7 +111,7 @@ public final class Shell {
             if (board != null) {
               game = board;
             } else {
-              System.out.println("Error! Invalid move!");
+              System.out.println(getError(402));
               break;
             }
           } catch (IllegalMoveException | IllegalArgumentException e) {
@@ -127,11 +130,10 @@ public final class Shell {
             System.out.println(Utility.MACHINE_MISS);
           }
         } else {
-          System.out.println("Error! No game started yet.");
+          System.out.println(getError(300));
         }
         break;
       case 'S':
-        // TODO: check switch
         if (game != null) {
           OPENING_PLAYER = Player.getOpponent(OPENING_PLAYER);
 
@@ -142,14 +144,14 @@ public final class Shell {
             machineMove();
           }
         } else {
-          System.out.println("Error! No game started yet.");
+          System.out.println(getError(300));
         }
         break;
       case 'P':
         if (game != null) {
           System.out.println(game);
         } else {
-          System.out.println("Error! No game started yet.");
+          System.out.println(getError(300));
         }
         break;
       case 'H':
@@ -161,7 +163,7 @@ public final class Shell {
       case 'E':
         break;
       default:
-        System.out.println("Error! You must enter a command.");
+        System.out.println(getError(200));
         break;
     }
 
@@ -171,35 +173,33 @@ public final class Shell {
   /**
    * Checks if user input parameters are valid.
    *
-   * @param command   a user input command.
-   * @param args      possible parameters.
-   * @return          a HashMap with all cleaned arguments.
+   * @param command   A user input command.
+   * @param args      Possible parameters.
+   * @return          A HashMap with all cleaned arguments.
    */
-  private static HashMap<String, Integer> parseArgs(String command,
+  private static Map<String, Integer> parseArgs(String command,
       String[] args) {
-    HashMap<String, Integer> params = new HashMap<>();
+    Map<String, Integer> params = new HashMap<>();
     params.put("error", 0);
-    // TODO: Add own error method
 
     switch (Character.toUpperCase(command.toCharArray()[0])) {
       case 'N':
         if (args.length == 3) {
-          int pits = 0, seeds = 0;
+          int pits;
+          int seeds;
 
           try {
             pits = Integer.parseInt(args[1]);
             seeds = Integer.parseInt(args[2]);
           } catch (NumberFormatException nfe) {
-            System.out.println("Error! All arguments must "
-                + "be numbers.");
+            System.out.println(getError(100));
             break;
           }
 
           params.put("pits", pits);
           params.put("seeds", seeds);
         } else {
-          System.out.println("Error! Wrong number of arguments: "
-              + "+2 integers expected.");
+          System.out.println(getError(101));
           params.put("error", 1);
         }
         break;
@@ -210,20 +210,17 @@ public final class Shell {
           try {
             pit = Integer.parseInt(args[1]);
           } catch (NumberFormatException nfe) {
-            System.out.println("Error! All arguments must "
-                + "be numbers.");
+            System.out.println(getError(100));
           }
 
           if (pit > 0) {
             params.put("pit", pit);
           } else {
-            System.out.println("Error! Parameter must "
-                + "be positive and not zero.");
+            System.out.println(getError(103));
             params.put("error", 1);
           }
         } else {
-          System.out.println("Error! Wrong number of arguments: "
-              + "+1 integers expected.");
+          System.out.println(getError(104));
           params.put("error", 1);
         }
         break;
@@ -235,15 +232,15 @@ public final class Shell {
             if (level >= 1 && level <= 7) {
               params.put("level", level);
             } else {
-              System.out.println("Error! Level must be between 1 and 7");
+              System.out.println(getError(403));
               params.put("error", 1);
             }
           } catch (NumberFormatException nfe) {
-            System.out.println("Error! The level must be a number.");
+            System.out.println(getError(105));
             params.put("error", 1);
           }
         } else {
-          System.out.println("Error! You must specify a level.");
+          System.out.println(getError(201));
           params.put("error", 1);
         }
         break;
@@ -254,29 +251,37 @@ public final class Shell {
     return params;
   }
 
-  private static boolean isValid(int[] values) {
-    boolean result = true;
-    for (int num : values) {
-      if (num < 1) {
-        result = false;
-      }
-    }
-
-    return result;
+  /**
+   * Fetches the belonging error message to a given code and returns it as a
+   * string in order to work in text based applications as well as be reusable
+   * in applications with a graphical user interface.
+   *
+   * @param code The error code as stated in {@link Utility}.
+   * @return The error message.
+   */
+  private static String getError(int code) {
+    return "Error! " + Utility.ERROR_MESSAGES.get(code);
   }
 
+  /**
+   * Executes a machine move on the board and prints appropriate messages which
+   * pit the machine took and if the other player must miss a turn.
+   */
   private static void machineMove() {
     game = game.machineMove();
     System.out.format(Utility.MACHINE_MOVE, game.sourcePitOfLastMove(),
         game.targetPitOfLastMove());
 
-    // TODO: redundant opening==machine check? Check!
     while (game.getOpeningPlayer() == Player.MACHINE && !game.isGameOver()) {
       System.out.println(Utility.HUMAN_MISS);
       machineMove();
     }
   }
 
+  /**
+   * Checks the board for the winner of a game and prints an appropriate
+   * message on the screen.
+   */
   private static void getWinner() {
     if (game.getWinner() == null) {
       System.out.format(Utility.STALEMATE, game.getSeedsOfPlayer(Player.HUMAN));
@@ -291,7 +296,7 @@ public final class Shell {
 
   /**
    * Prints a help text to the console, showing some useful
-   * information on how to use this program.
+   * information on how to use this application.
    */
   private static void showHelp() {
     System.out.println("Mancala/Kalah – A game written in Java\n");

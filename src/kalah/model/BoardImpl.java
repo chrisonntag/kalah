@@ -2,7 +2,6 @@ package kalah.model;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import kalah.controller.Node;
@@ -119,8 +118,7 @@ public class BoardImpl implements Board {
           return null;
         }
       } catch (ArrayIndexOutOfBoundsException e) {
-        throw new IllegalArgumentException(
-            "Error! The pit is not on the grid!");
+        throw new IllegalArgumentException("Error! The pit is not on the grid!");
       }
     }
 
@@ -250,7 +248,7 @@ public class BoardImpl implements Board {
       //System.out.println("\t\t\t\tR: " + root.getScore());
 
       // TODO: Check role of opening and next player.
-      ArrayList<Board> possibleStates =
+      List<Board> possibleStates =
           getPossibleGameStates(getOpeningPlayer());
       for (Board board : possibleStates) {
         Node child = ((BoardImpl) board).constructTree(depth + 1);
@@ -261,9 +259,9 @@ public class BoardImpl implements Board {
     }
   }
 
-  private ArrayList<Board> getPossibleGameStates(Player player) {
+  private List<Board> getPossibleGameStates(Player player) {
     // TODO: is ArrayList useful here?
-    ArrayList<Board> gameStates = new ArrayList<>();
+    List<Board> gameStates = new ArrayList<>();
     for (int pitNum : getPlayerPits(player)) {
       if (getPit(pitNum).getSeeds() != 0) {
         BoardImpl state = this.clone();
@@ -357,8 +355,8 @@ public class BoardImpl implements Board {
     return 3 * scoreS + scoreC + scoreP + scoreV;
   }
 
-  private ArrayList<Integer> getPlayerPits(Player player) {
-    ArrayList<Integer> playerPits = new ArrayList<>();
+  private List<Integer> getPlayerPits(Player player) {
+    List<Integer> playerPits = new ArrayList<>();
     int firstPitNum = 1;
     int lastPitNum = getPitsPerPlayer();
     if (player == Player.MACHINE) {
