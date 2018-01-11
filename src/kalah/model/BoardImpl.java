@@ -206,8 +206,8 @@ public class BoardImpl implements Board {
     BoardImpl machineBoard = (BoardImpl) root.getMaxChild().getBoard();
 
     // TODO: DEBUG statements
-    System.out.println(printTree(root));
-    System.out.println(machineBoard);
+    //System.out.println(printTree(root));
+    //System.out.println(machineBoard);
 
     return machineBoard;
   }
@@ -553,9 +553,9 @@ public class BoardImpl implements Board {
   /**
    * {@inheritDoc}
    */
+  /*
   @Override
   public String toString() {
-    // TODO: only one space between pits, no tabs
     List<Integer> decimalPlaces = new LinkedList<>();
     StringBuilder upperRow = new StringBuilder();
     StringBuilder lowerRow = new StringBuilder();
@@ -602,7 +602,9 @@ public class BoardImpl implements Board {
         }
 
         pit.append(this.pits[i][j].toString());
-        pit.append(" ");
+        if (j != getPitsPerPlayer()) {
+          pit.append(" ");
+        }
 
         if (i == 0) {
           upperRow.append(pit);
@@ -619,4 +621,48 @@ public class BoardImpl implements Board {
 
     return upperRow.toString() + lowerRow.toString();
   }
+*/
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String toString() {
+    int maxDecimalNum = 1;
+    for (int i = 0; i < this.pits.length; i++) {
+      for (int j = 0; j < this.pits[i].length; j++) {
+        if (this.pits[i][j].toString().length() > maxDecimalNum) {
+          maxDecimalNum = this.pits[i][j].toString().length();
+        }
+      }
+    }
+    StringBuilder upperRow = new StringBuilder();
+    StringBuilder lowerRow = new StringBuilder();
+    int lowerRowMargin = 2;
+    for (int i = 0; i < this.pits.length; i++) {
+      for (int j = 0; j < this.pits[i].length; j++) {
+        if (j == 0 && i == 0) {
+          lowerRowMargin = this.pits[i][j].toString().length() + 1;
+        }
+
+        String pit = String.format("%" + maxDecimalNum + "d", this.pits[i][j].getSeeds());
+        if (i == 0) {
+          upperRow.append(pit);
+          if (j < getPitsPerPlayer()) {
+            upperRow.append(" ");
+          }
+        } else {
+          lowerRow.append(pit);
+          if (j < getPitsPerPlayer()) {
+            lowerRow.append(" ");
+          }
+        }
+      }
+    }
+
+    for (int i = 0; i < lowerRowMargin; i++) {
+      lowerRow.insert(0, " ");
+    }
+    return upperRow.toString().trim() + "\n" + lowerRow.toString();
+  }
+
 }
