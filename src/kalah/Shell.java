@@ -9,7 +9,7 @@ import java.util.Scanner;
 import kalah.exceptions.IllegalMoveException;
 import kalah.model.Board;
 import kalah.model.BoardImpl;
-import kalah.model.players.Player;
+import kalah.model.Player;
 import kalah.util.UserCommunication;
 
 /**

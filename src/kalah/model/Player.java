@@ -1,4 +1,4 @@
-package kalah.model.players;
+package kalah.model;
 
 /**
  * Represents a player in the game "Kalah".

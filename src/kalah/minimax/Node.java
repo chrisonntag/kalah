@@ -3,7 +3,7 @@ package kalah.minimax;
 import java.util.ArrayList;
 import java.util.List;
 import kalah.model.Board;
-import kalah.model.players.Player;
+import kalah.model.Player;
 
 /**
  * Represents a node in a tree with up to n children. The {@link Node} itself

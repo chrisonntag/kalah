@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import kalah.exceptions.IllegalMoveException;
 import kalah.minimax.Node;
-import kalah.model.players.Player;
 
 /**
  * {@inheritDoc}
