@@ -345,7 +345,7 @@ public class BoardImpl implements Board {
         if (!isGameOver()) {
             scoreV = 0;
         } else {
-            if (getWinner() == null) {
+            if (getWinner() == Player.NONE) {
                 scoreV = 0;
             } else {
                 if (getWinner() == Player.HUMAN) {
