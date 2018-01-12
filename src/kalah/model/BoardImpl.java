@@ -284,60 +284,21 @@ public class BoardImpl implements Board {
         // Evaluate seeds in the stores.
         int machineStore = (getPitsPerPlayer() + 1) * 2;
         int humanStore = getPitsPerPlayer() + 1;
-
         double scoreS = getSeeds(machineStore) - 1.5 * getSeeds(humanStore);
 
         // Evaluate number of opposing seeds which can be captured in this move.
-        double catchableHumanSeeds = 0; // the ones the machine can catch
-        double catchableMachineSeeds = 0; // the ones the human can catch
-        Set<Integer> targetPitsHuman = getPossibleTargetPits(Player.HUMAN);
-        Set<Integer> targetPitsMachine =
-            getPossibleTargetPits(Player.MACHINE);
+        // the ones the machine can catch
+        double catchableHumanSeeds = getCatchableSeeds(Player.MACHINE);
 
-        // Loops through all possible target pits of the human in order to find
-        // catchable seeds of the machine.
-        for (int target : targetPitsHuman) {
-            if (getPit(target).getSeeds() == 0
-                && getPit(target).getOwner() == Player.HUMAN
-                && !getPit(target).isStore()) {
-                catchableMachineSeeds += getPit(getOpposingPitNum(target))
-                    .getSeeds();
-            }
-        }
-
-        // Loops through all possible target pits of the machine in order to
-        // find catchable seeds of the human.
-        for (int target : targetPitsMachine) {
-            if (getPit(target).getSeeds() == 0
-                && getPit(target).getOwner() == Player.MACHINE
-                && !getPit(target).isStore()) {
-                catchableHumanSeeds += getPit(getOpposingPitNum(target))
-                    .getSeeds();
-            }
-        }
+        // the ones the human can catch
+        double catchableMachineSeeds = getCatchableSeeds(Player.HUMAN);
         double scoreC = catchableHumanSeeds - 1.5 * catchableMachineSeeds;
 
         // Evaluate the number of empty pits whose opposing opposite
         // pits contain at least twice the number of seeds as initial
         // per pit at the game start.
-        double emptyHumanPits = 0;
-        double emptyMachinePits = 0;
-        for (int pitNum : getSourcePits(Player.HUMAN)) {
-            if (getPit(pitNum).getSeeds() == 0
-                && getPit(getOpposingPitNum(pitNum)).getSeeds()
-                >= 2 * getSeedsPerPit()) {
-                emptyHumanPits += 1;
-            }
-        }
-
-        for (int pitNum : getSourcePits(Player.MACHINE)) {
-            if (getPit(pitNum).getSeeds() == 0
-                && getPit(getOpposingPitNum(pitNum)).getSeeds()
-                >= 2 * getSeedsPerPit()) {
-                emptyMachinePits += 1;
-            }
-        }
-
+        double emptyHumanPits = getEmptyPits(Player.HUMAN);
+        double emptyMachinePits = getEmptyPits(Player.MACHINE);
         double scoreP = emptyMachinePits - 1.5 * emptyHumanPits;
 
         // Evaluate if a move leads to a victory immediately.
@@ -357,6 +318,51 @@ public class BoardImpl implements Board {
         }
 
         return 3 * scoreS + scoreC + scoreP + scoreV;
+    }
+
+    /**
+     * Get the number of empty pits whose opposing opposite
+     * pits contain at least twice the number of seeds as initial
+     * per pit at the game start.
+     *
+     * @param player The player where to look for.
+     * @return The number of empty pits.
+     */
+    private int getEmptyPits(Player player) {
+        int emptyPits = 0;
+        for (int pitNum : getSourcePits(player)) {
+            if (getPit(pitNum).getSeeds() == 0
+                && getPit(getOpposingPitNum(pitNum)).getSeeds()
+                >= 2 * getSeedsPerPit()) {
+                emptyPits += 1;
+            }
+        }
+
+        return emptyPits;
+    }
+
+    /**
+     * Loops through all possible target pits of the player in order to find
+     * catchable seeds of the opponent.
+     *
+     * @param player The player which to look for.
+     * @return All catchable seeds.
+     */
+    private int getCatchableSeeds(Player player) {
+        Set<Integer> targetPits = getPossibleTargetPits(player);
+        int catchableSeeds = 0;
+
+        // Loops through all possible target pits of the human in order to find
+        // catchable seeds of the machine.
+        for (int target : targetPits) {
+            if (getPit(target).getSeeds() == 0
+                && getPit(target).getOwner() == player
+                && !getPit(target).isStore()) {
+                catchableSeeds += getPit(getOpposingPitNum(target)).getSeeds();
+            }
+        }
+
+        return catchableSeeds;
     }
 
     /**
