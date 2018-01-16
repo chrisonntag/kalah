@@ -1,6 +1,5 @@
 package kalah.model;
 
-import kalah.model.players.Player;
 import kalah.exceptions.IllegalMoveException;
 
 /**
