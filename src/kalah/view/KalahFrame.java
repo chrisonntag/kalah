@@ -19,7 +19,7 @@ import kalah.model.BoardMediator;
 public class KalahFrame extends JFrame implements Observer {
 
     private JPanel mainPanel = new JPanel();
-    private JPanel controlPanel = new ControlPanel();
+    private JPanel controlPanel;
     private JPanel gamePanel;
 
     private BoardMediator boardMediator;
@@ -29,6 +29,7 @@ public class KalahFrame extends JFrame implements Observer {
         boardMediator = new BoardMediator();
         boardMediator.addObserver(this);
 
+        controlPanel = new ControlPanel(boardMediator);
         gamePanel = new BoardPanel(boardMediator.getGame());
 
         mainPanel.setLayout(new BorderLayout());

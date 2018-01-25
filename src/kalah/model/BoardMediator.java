@@ -8,7 +8,8 @@ import kalah.util.UserCommunication;
 
 public class BoardMediator extends Observable {
 
-    private static final int DEFAULT_LEVEL = 3;
+    // TODO: Klassengeheimnis?
+    public static final int DEFAULT_LEVEL = 3;
     private int level = DEFAULT_LEVEL;
     private int seedsPerPit = Board.DEFAULT_SEEDS_PER_PIT;
     private int pitsPerPlayer = Board.DEFAULT_PITS_PER_PLAYER;
