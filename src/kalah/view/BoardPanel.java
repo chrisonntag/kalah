@@ -9,14 +9,15 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.border.Border;
 import kalah.model.Board;
+import kalah.model.BoardMediator;
 
-public class BoardPanel extends JPanel {
+public class BoardPanel extends JPanel implements Observer {
 
     private static final Color LIGHT_WOOD = new Color(198, 159, 111);
     private static final Color DARK_WOOD = new Color(136, 97, 54);
 
+    private BoardMediator boardMediator;
     private Board gameBoard;
 
     private JPanel upperNumberPanel;
@@ -25,10 +26,18 @@ public class BoardPanel extends JPanel {
 
     private int columns;
 
-    public BoardPanel(Board board) {
-        gameBoard = board;
+    public BoardPanel(BoardMediator boardMediator) {
+        this.boardMediator = boardMediator;
+        gameBoard = this.boardMediator.getGame();
         this.setLayout(new BorderLayout());
+        paintBoard();
 
+        setVisible(true);
+    }
+
+    private void paintBoard() {
+        this.removeAll();
+        this.gameBoard = this.boardMediator.getGame();
         columns = gameBoard.getPitsPerPlayer() + 2;
 
         upperNumberPanel = new JPanel();
@@ -68,7 +77,13 @@ public class BoardPanel extends JPanel {
         this.add(upperNumberPanel, BorderLayout.NORTH);
         this.add(pitsPanel, BorderLayout.CENTER);
         this.add(lowerNumberPanel,  BorderLayout.SOUTH);
-        setVisible(true);
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+        paintBoard();
+        this.repaint();
+        this.revalidate();
     }
 
     class Pit extends JPanel {

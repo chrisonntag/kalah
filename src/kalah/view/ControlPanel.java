@@ -1,6 +1,8 @@
 package kalah.view;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -39,6 +41,40 @@ public class ControlPanel extends JPanel {
         this.add(pitsCombo);
         this.add(seedsCombo);
         this.add(levelCombo);
+
+        initializeActionListeners();
+    }
+
+    private void initializeActionListeners() {
+        newButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                newGame();
+            }
+        });
+
+        switchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boardMediator.switchPlayers();
+            }
+        });
+
+        quitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                quitApplication();
+            }
+        });
+
+        undoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!boardMediator.isStackEmpty()) {
+                    boardMediator.doUndo();
+                }
+            }
+        });
     }
 
     /**
@@ -71,11 +107,17 @@ public class ControlPanel extends JPanel {
     private void newGame() {
         int pits = (Integer) pitsCombo.getSelectedItem();
         int seeds = (Integer) seedsCombo.getSelectedItem();
+        int level = (Integer) levelCombo.getSelectedItem();
 
         String message = String.format("Start a new game with %d pits and %d seeds per Player?", pits, seeds);
         if (showConfirmDialog(message, "New Game") == 0) {
-            boardMediator.newGame();
+            boardMediator.newGame(pits, seeds, level);
         }
+    }
+
+    private void quitApplication() {
+        // TODO: Change to appropriate exit.
+        System.exit(0);
     }
 
 }

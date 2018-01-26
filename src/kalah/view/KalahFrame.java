@@ -14,9 +14,10 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+import kalah.model.Board;
 import kalah.model.BoardMediator;
 
-public class KalahFrame extends JFrame implements Observer {
+public class KalahFrame extends JFrame {
 
     private JPanel mainPanel = new JPanel();
     private JPanel controlPanel;
@@ -27,10 +28,11 @@ public class KalahFrame extends JFrame implements Observer {
     public KalahFrame() {
         super("Kalah Game");
         boardMediator = new BoardMediator();
-        boardMediator.addObserver(this);
 
         controlPanel = new ControlPanel(boardMediator);
-        gamePanel = new BoardPanel(boardMediator.getGame());
+        gamePanel = new BoardPanel(boardMediator);
+
+        boardMediator.addObserver((Observer) gamePanel);
 
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(gamePanel, BorderLayout.CENTER);
@@ -50,11 +52,6 @@ public class KalahFrame extends JFrame implements Observer {
                 new KalahFrame();
             }
         });
-    }
-
-    @Override
-    public void update(Observable observable, Object data) {
-        this.gamePanel.repaint();
     }
 
     private void setKeyCombinations() {

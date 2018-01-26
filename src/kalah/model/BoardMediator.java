@@ -7,8 +7,7 @@ import kalah.exceptions.IllegalMoveException;
 import kalah.util.UserCommunication;
 
 public class BoardMediator extends Observable {
-
-    // TODO: Klassengeheimnis?
+    // TODO: class secret?
     public static final int DEFAULT_LEVEL = 3;
     private int level = DEFAULT_LEVEL;
     private int seedsPerPit = Board.DEFAULT_SEEDS_PER_PIT;
@@ -21,6 +20,7 @@ public class BoardMediator extends Observable {
 
     public BoardMediator() {
         newGame();
+        machineThread = new Thread();
         undoStack = new ArrayDeque<>();
     }
 
@@ -84,17 +84,25 @@ public class BoardMediator extends Observable {
     }
 
     public void machineMove() {
-        game = game.machineMove();
-        setChanged();
-        notifyObservers(game);
+        machineThread = new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                game = game.machineMove();
+                setChanged();
+                notifyObservers(game);
 
-        System.out.format(UserCommunication.MACHINE_MOVE,
-            game.sourcePitOfLastMove(), game.targetPitOfLastMove());
+                System.out.format(UserCommunication.MACHINE_MOVE,
+                    game.sourcePitOfLastMove(), game.targetPitOfLastMove());
 
-        while (game.getOpeningPlayer() == Player.MACHINE && !game.isGameOver()) {
-            System.out.println(UserCommunication.HUMAN_MISS);
-            machineMove();
-        }
+                while (game.getOpeningPlayer() == Player.MACHINE && !game.isGameOver()) {
+                    System.out.println(UserCommunication.HUMAN_MISS);
+                    machineMove();
+                }
+            }
+        };
+
+        machineThread.start();
     }
 
     /**
@@ -116,8 +124,16 @@ public class BoardMediator extends Observable {
         }
     }
 
+    public boolean isStackEmpty() {
+        return undoStack.isEmpty();
+    }
+
     public Board getGame() {
         return game;
+    }
+
+    public void setGame(Board game) {
+        this.game = game;
     }
 
     /**
