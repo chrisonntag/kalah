@@ -13,19 +13,23 @@ public class BoardMediator extends Observable {
     private int seedsPerPit = Board.DEFAULT_SEEDS_PER_PIT;
     private int pitsPerPlayer = Board.DEFAULT_PITS_PER_PLAYER;
     private Player openingPlayer = Player.HUMAN;
-    private Board game = null;
 
-    private Deque<Board> undoStack;
+    /**
+     * Don't need a thread-safe deque here --> Use ArrayDeque.
+     */
+    private Deque<Board> gameStack;
     private Thread machineThread;
 
     public BoardMediator() {
-        newGame();
         machineThread = new Thread();
-        undoStack = new ArrayDeque<>();
+        gameStack = new ArrayDeque<>();
+        newGame();
     }
 
     public void newGame() {
-        game = new BoardImpl(openingPlayer, pitsPerPlayer, seedsPerPit, level);
+        Board game = new BoardImpl(openingPlayer, pitsPerPlayer, seedsPerPit, level);
+        gameStack.clear();
+        gameStack.push(game);
         setChanged();
         notifyObservers(game);
     }
@@ -38,11 +42,11 @@ public class BoardMediator extends Observable {
     }
 
     public void switchPlayers() {
-        if (game != null) {
+        if (gameStack.size() > 0) {
             openingPlayer = Player.getOpponent(openingPlayer);
             newGame();
 
-            if (game.getOpeningPlayer() == Player.MACHINE) {
+            if (gameStack.peek().getOpeningPlayer() == Player.MACHINE) {
                 machineMove();
             }
         } else {
@@ -51,24 +55,31 @@ public class BoardMediator extends Observable {
     }
 
     public void doUndo() {
+        if (gameStack.size() > 0) {
+            if (gameStack.pop().getOpeningPlayer() == Player.HUMAN) {
+                gameStack.pop();
+            }
 
+            setChanged();
+            notifyObservers(gameStack.peek());
+        }
     }
 
     public void setLevel(int level) {
         this.level = level;
 
-        if (game != null) {
-            game.setLevel(level);
+        if (gameStack.size() > 0) {
+            gameStack.peek().setLevel(level);
         }
     }
 
     public void humanMove(int pit) {
-        if (game != null) {
+        if (gameStack.size() > 0) {
             try {
-                game = game.move(pit);
+                Board game = gameStack.peek().move(pit);
+                gameStack.push(game);
                 setChanged();
                 notifyObservers(game);
-
             } catch (IllegalMoveException
                 | IllegalArgumentException e) {
                 System.out.println(e.getMessage());
@@ -76,11 +87,11 @@ public class BoardMediator extends Observable {
                 System.out.println(getError(402));
             }
 
-            if (game.isGameOver()) {
+            if (gameStack.peek().isGameOver()) {
                 getWinner();
-            } else if (game.getOpeningPlayer() == Player.MACHINE) {
+            } else if (gameStack.peek().getOpeningPlayer() == Player.MACHINE) {
                 machineMove();
-                if (game.isGameOver()) {
+                if (gameStack.peek().isGameOver()) {
                     getWinner();
                 }
             } else {
@@ -95,9 +106,10 @@ public class BoardMediator extends Observable {
         machineThread = new Thread() {
             @Override
             public void run() {
-                //super.run();
-                while (game.getOpeningPlayer() == Player.MACHINE && !game.isGameOver()) {
-                    game = game.machineMove();
+                while (gameStack.peek().getOpeningPlayer() == Player.MACHINE
+                    && !gameStack.peek().isGameOver()) {
+                    Board game = gameStack.peek().machineMove();
+                    gameStack.push(game);
                     setChanged();
                     notifyObservers(game);
 
@@ -119,30 +131,26 @@ public class BoardMediator extends Observable {
      * message on the screen.
      */
     private void getWinner() {
-        if (game.getWinner() == Player.NONE) {
+        if (gameStack.peek().getWinner() == Player.NONE) {
             System.out.format(UserCommunication.STALEMATE,
-                game.getSeedsOfPlayer(Player.HUMAN));
-        } else if (game.getWinner() == Player.HUMAN) {
+                gameStack.peek().getSeedsOfPlayer(Player.HUMAN));
+        } else if (gameStack.peek().getWinner() == Player.HUMAN) {
             System.out.format(UserCommunication.WIN,
-                game.getSeedsOfPlayer(Player.HUMAN),
-                game.getSeedsOfPlayer(Player.MACHINE));
+                gameStack.peek().getSeedsOfPlayer(Player.HUMAN),
+                gameStack.peek().getSeedsOfPlayer(Player.MACHINE));
         } else {
             System.out.format(UserCommunication.LOOSE,
-                game.getSeedsOfPlayer(Player.MACHINE),
-                game.getSeedsOfPlayer(Player.HUMAN));
+                gameStack.peek().getSeedsOfPlayer(Player.MACHINE),
+                gameStack.peek().getSeedsOfPlayer(Player.HUMAN));
         }
     }
 
     public boolean isStackEmpty() {
-        return undoStack.isEmpty();
+        return gameStack.isEmpty();
     }
 
     public Board getGame() {
-        return game;
-    }
-
-    public void setGame(Board game) {
-        this.game = game;
+        return gameStack.peek();
     }
 
     /**
