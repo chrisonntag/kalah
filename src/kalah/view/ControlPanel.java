@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import kalah.model.Board;
 import kalah.model.BoardMediator;
+import kalah.util.UserCommunication;
 
 public class ControlPanel extends JPanel {
 
@@ -108,17 +109,13 @@ public class ControlPanel extends JPanel {
         return range;
     }
 
-    private int showConfirmDialog(String message, String title) {
-        return JOptionPane.showConfirmDialog((Component) null, message, title, 0);
-    }
-
     private void newGame() {
         int pits = (Integer) pitsCombo.getSelectedItem();
         int seeds = (Integer) seedsCombo.getSelectedItem();
         int level = (Integer) levelCombo.getSelectedItem();
 
         String message = String.format("Start a new game with %d pits and %d seeds per Player?", pits, seeds);
-        if (showConfirmDialog(message, "New Game") == 0) {
+        if (UserCommunication.showConfirmDialog(message, "New Game") == 0) {
             boardMediator.newGame(pits, seeds, level);
         }
     }

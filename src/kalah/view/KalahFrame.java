@@ -58,31 +58,32 @@ public class KalahFrame extends JFrame {
         this.getRootPane().getInputMap(2).put(KeyStroke.getKeyStroke("alt N"), "NEW");
         this.getRootPane().getActionMap().put("NEW", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //boardMediator.newGame();
-                System.out.println("KeyComb: NEW");
+                boardMediator.newGame();
             }
         });
         this.getRootPane().getInputMap(2).put(KeyStroke.getKeyStroke("alt S"), "SWITCH");
         this.getRootPane().getActionMap().put("SWITCH", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //boardMediator.switchPlayer();
-                System.out.println("KeyComb: SWITCH");
+                boardMediator.switchPlayers();
             }
         });
         this.getRootPane().getInputMap(2).put(KeyStroke.getKeyStroke("alt U"), "UNDO");
         this.getRootPane().getActionMap().put("UNDO", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //boardMediator.undo();
-                System.out.println("KeyComb: UNDO");
+                boardMediator.doUndo();
             }
         });
         this.getRootPane().getInputMap(2).put(KeyStroke.getKeyStroke("alt Q"), "QUIT");
         this.getRootPane().getActionMap().put("QUIT", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //this.closeWindow();
-                System.out.println("KeyComb: QUIT");
+                quitApplication();
             }
         });
+    }
+
+    private void quitApplication() {
+        // TODO: Change to appropriate exit.
+        System.exit(0);
     }
 
 }

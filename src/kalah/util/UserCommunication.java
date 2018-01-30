@@ -1,7 +1,9 @@
 package kalah.util;
 
+import java.awt.Component;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.JOptionPane;
 
 /**
  * Data class for the "Kalah" game. It holds messages to inform the user about
@@ -75,7 +77,11 @@ public final class UserCommunication {
                 put(402, "Invalid move!");
                 put(403, "Level must be between 1 and 7");
             }
-        };
+    };
+
+    public static int showConfirmDialog(String message, String title) {
+        return JOptionPane.showConfirmDialog(null, message, title, 0);
+    }
 
     private UserCommunication() { }
 
