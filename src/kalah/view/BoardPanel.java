@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.LabelUI;
 import kalah.model.Board;
+import kalah.model.BoardImpl;
 import kalah.model.BoardMediator;
 
 public class BoardPanel extends JPanel implements Observer {
@@ -89,14 +90,25 @@ public class BoardPanel extends JPanel implements Observer {
         this.add(lowerNumberPanel,  BorderLayout.SOUTH);
     }
 
+    /**
+     * This method is called whenever the observed object is changed. An
+     * application calls an <tt>Observable</tt> object's
+     * <code>notifyObservers</code> method to have all the object's
+     * observers notified of the change.
+     *
+     * @param observable the observable object.
+     * @param data an argument passed to the <code>notifyObservers</code>
+     */
     @Override
     public void update(Observable observable, Object data) {
         // Update local game board.
-        this.gameBoard = (Board) data;
+        if (data instanceof Board) {
+            this.gameBoard = (Board) data;
 
-        paintBoard();
-        this.repaint();
-        this.revalidate();
+            paintBoard();
+            this.repaint();
+            this.revalidate();
+        }
     }
 
     class Pit extends JPanel {

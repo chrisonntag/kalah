@@ -106,6 +106,8 @@ public class BoardMediator extends Observable {
         machineThread = new Thread() {
             @Override
             public void run() {
+                delay(3000);
+
                 while (gameStack.peek().getOpeningPlayer() == Player.MACHINE
                     && !gameStack.peek().isGameOver()) {
                     Board game = gameStack.peek().machineMove();
@@ -119,6 +121,14 @@ public class BoardMediator extends Observable {
                     if (game.getOpeningPlayer() == Player.MACHINE) {
                         System.out.println(UserCommunication.HUMAN_MISS);
                     }
+                }
+            }
+
+            private void delay(long millis) {
+                try {
+                    sleep(millis);
+                } catch (InterruptedException ex) {
+                    currentThread().interrupt();
                 }
             }
         };

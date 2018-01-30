@@ -4,16 +4,20 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Observable;
+import java.util.Observer;
+import javax.swing.Timer;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import kalah.model.Board;
 import kalah.model.BoardMediator;
 import kalah.util.UserCommunication;
 
-public class ControlPanel extends JPanel {
+public class ControlPanel extends JPanel implements Observer {
 
     private JButton newButton = new JButton("New");
     private JButton switchButton = new JButton("Switch");
@@ -22,6 +26,8 @@ public class ControlPanel extends JPanel {
     private JComboBox<Integer> pitsCombo;
     private JComboBox<Integer> seedsCombo;
     private JComboBox<Integer> levelCombo;
+    private JLabel timeLabel = new JLabel();
+    private Timer timer;
 
     private BoardMediator boardMediator;
 
@@ -37,6 +43,11 @@ public class ControlPanel extends JPanel {
         seedsCombo.setSelectedItem(Board.DEFAULT_SEEDS_PER_PIT);
         levelCombo.setSelectedItem(BoardMediator.DEFAULT_LEVEL);
 
+        this.undoButton.setEnabled(false);
+
+        timer = createTimer(1000);
+        timer.setInitialDelay(1000);
+
         this.add(newButton);
         this.add(switchButton);
         this.add(undoButton);
@@ -44,7 +55,9 @@ public class ControlPanel extends JPanel {
         this.add(pitsCombo);
         this.add(seedsCombo);
         this.add(levelCombo);
+        this.add(timeLabel);
 
+        timer.start();
         initializeActionListeners();
     }
 
@@ -86,6 +99,41 @@ public class ControlPanel extends JPanel {
                 boardMediator.setLevel(level);
             }
         });
+    }
+
+    private Timer createTimer(int delay) {
+        return new Timer(1000, new ActionListener() {
+            private int time = 1;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                timeLabel.setText(Integer.toString(time) + "s");
+                time += 1;
+            }
+        });
+    }
+
+    /**
+     * This method is called whenever the observed object is changed. An
+     * application calls an <tt>Observable</tt> object's
+     * <code>notifyObservers</code> method to have all the object's
+     * observers notified of the change.
+     *
+     * @param observable the observable object.
+     * @param data an argument passed to the <code>notifyObservers</code>
+     */
+    @Override
+    public void update(Observable observable, Object data) {
+        // Reset timer.
+        timer.stop();
+        timer = createTimer(1000);
+        timer.setInitialDelay(1000);
+        timer.start();
+
+        // Check if undo is possible.
+        if (!boardMediator.isStackEmpty()) {
+            undoButton.setEnabled(true);
+        }
     }
 
     /**

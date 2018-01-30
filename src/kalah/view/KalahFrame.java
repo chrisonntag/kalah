@@ -33,6 +33,7 @@ public class KalahFrame extends JFrame {
         gamePanel = new BoardPanel(boardMediator);
 
         boardMediator.addObserver((Observer) gamePanel);
+        boardMediator.addObserver((Observer) controlPanel);
 
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(gamePanel, BorderLayout.CENTER);
