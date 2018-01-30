@@ -75,6 +75,14 @@ public class ControlPanel extends JPanel {
                 }
             }
         });
+
+        levelCombo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int level = (Integer) levelCombo.getSelectedItem();
+                boardMediator.setLevel(level);
+            }
+        });
     }
 
     /**

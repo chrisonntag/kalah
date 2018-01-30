@@ -54,6 +54,14 @@ public class BoardMediator extends Observable {
 
     }
 
+    public void setLevel(int level) {
+        this.level = level;
+
+        if (game != null) {
+            game.setLevel(level);
+        }
+    }
+
     public void humanMove(int pit) {
         if (game != null) {
             try {
@@ -87,17 +95,18 @@ public class BoardMediator extends Observable {
         machineThread = new Thread() {
             @Override
             public void run() {
-                super.run();
-                game = game.machineMove();
-                setChanged();
-                notifyObservers(game);
-
-                System.out.format(UserCommunication.MACHINE_MOVE,
-                    game.sourcePitOfLastMove(), game.targetPitOfLastMove());
-
+                //super.run();
                 while (game.getOpeningPlayer() == Player.MACHINE && !game.isGameOver()) {
-                    System.out.println(UserCommunication.HUMAN_MISS);
-                    machineMove();
+                    game = game.machineMove();
+                    setChanged();
+                    notifyObservers(game);
+
+                    System.out.format(UserCommunication.MACHINE_MOVE,
+                        game.sourcePitOfLastMove(), game.targetPitOfLastMove());
+
+                    if (game.getOpeningPlayer() == Player.MACHINE) {
+                        System.out.println(UserCommunication.HUMAN_MISS);
+                    }
                 }
             }
         };

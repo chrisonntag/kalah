@@ -3,6 +3,8 @@ package kalah.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Observable;
 import java.util.Observer;
 import javax.swing.BorderFactory;
@@ -81,6 +83,9 @@ public class BoardPanel extends JPanel implements Observer {
 
     @Override
     public void update(Observable observable, Object data) {
+        // Update local game board.
+        this.gameBoard = (Board) data;
+
         paintBoard();
         this.repaint();
         this.revalidate();
@@ -101,6 +106,39 @@ public class BoardPanel extends JPanel implements Observer {
                 new JLabel(Integer.toString(gameBoard.getSeeds(pitNum)),
                     SwingConstants.CENTER);
             this.add(seedsLabel, BorderLayout.CENTER);
+
+            // Add a MouseListener only if this is a humans pit.
+            if (isHumanPit()) {
+                this.seedsLabel.addMouseListener(new MouseAdapter() {
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        boardMediator.humanMove(pitNum);
+                    }
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        setBorder(BorderFactory.createLineBorder(DARK_WOOD, 3));
+                    }
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        setBorder(BorderFactory.createLineBorder(DARK_WOOD, 1));
+                    }
+                });
+            }
+        }
+
+        private boolean isHumanPit() {
+            return this.pitNum <= gameBoard.getPitsPerPlayer();
         }
 
     }
