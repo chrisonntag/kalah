@@ -11,13 +11,14 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.plaf.LabelUI;
 import kalah.model.Board;
 import kalah.model.BoardMediator;
 
 public class BoardPanel extends JPanel implements Observer {
 
-    private static final Color LIGHT_WOOD = new Color(198, 159, 111);
-    private static final Color DARK_WOOD = new Color(136, 97, 54);
+    private static final Color LIGHT_WOOD = new Color(255, 206, 156);
+    private static final Color DARK_WOOD = new Color(132, 74, 25);
 
     private BoardMediator boardMediator;
     private Board gameBoard;
@@ -56,21 +57,28 @@ public class BoardPanel extends JPanel implements Observer {
         // Adding pits and stores.
         for (int i = (gameBoard.getPitsPerPlayer() + 1) * 2; i > gameBoard.getPitsPerPlayer() + 1; i--) {
             pitsPanel.add(new Pit(i));
-            upperNumberPanel.add(new JLabel(Integer.toString(i), 0), BorderLayout.CENTER);
+            JLabel rowNumberLabel = new JLabel(Integer.toString(i), 0);
+            rowNumberLabel.setForeground(LIGHT_WOOD);
+            upperNumberPanel.add(rowNumberLabel, BorderLayout.CENTER);
 
             if (i == columns) {
-                upperNumberPanel.add(new JLabel(Integer.toString(i - 1), 0), BorderLayout.CENTER);
+                rowNumberLabel = new JLabel(Integer.toString(i - 1), 0);
+                rowNumberLabel.setForeground(LIGHT_WOOD);
+                upperNumberPanel.add(rowNumberLabel, BorderLayout.CENTER);
             }
         }
         pitsPanel.add(new JPanel());
         pitsPanel.add(new JPanel());
+
         // Adding pits and stores.
-        lowerNumberPanel.add(new JLabel(Integer.toString((gameBoard.getPitsPerPlayer() + 1) * 2), 0),
-            BorderLayout.CENTER);
+        JLabel rowNumberLabel = new JLabel(Integer.toString((gameBoard.getPitsPerPlayer() + 1) * 2), 0);
+        rowNumberLabel.setForeground(LIGHT_WOOD);
+        lowerNumberPanel.add(rowNumberLabel, BorderLayout.CENTER);
         for (int i = 1; i <= gameBoard.getPitsPerPlayer() + 1; i++) {
             pitsPanel.add(new Pit(i));
-            lowerNumberPanel.add(new JLabel(Integer.toString(i), 0),
-                BorderLayout.CENTER);
+            rowNumberLabel = new JLabel(Integer.toString(i), 0);
+            rowNumberLabel.setForeground(LIGHT_WOOD);
+            lowerNumberPanel.add(rowNumberLabel, BorderLayout.CENTER);
         }
 
         // Adding number labels.
@@ -99,8 +107,7 @@ public class BoardPanel extends JPanel implements Observer {
         public Pit(int pitNum) {
             this.pitNum = pitNum;
             this.setLayout(new BorderLayout());
-            this.setBorder(
-                BorderFactory.createLineBorder(DARK_WOOD, 1));
+            this.setBorder(BorderFactory.createLineBorder(DARK_WOOD, 1));
             this.setOpaque(false);
             this.seedsLabel =
                 new JLabel(Integer.toString(gameBoard.getSeeds(pitNum)),

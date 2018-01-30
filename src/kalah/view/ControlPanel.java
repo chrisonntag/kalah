@@ -1,6 +1,7 @@
 package kalah.view;
 
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
@@ -26,7 +27,8 @@ public class ControlPanel extends JPanel {
 
     public ControlPanel(BoardMediator boardMediator) {
         this.boardMediator = boardMediator;
-        this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        // new BoxLayout(this, BoxLayout.X_AXIS)
+        this.setLayout(new FlowLayout());
 
         pitsCombo = new JComboBox<Integer>(generateComboboxRange(1, 12));
         seedsCombo = new JComboBox<Integer>(generateComboboxRange(1, 12));
