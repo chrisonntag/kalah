@@ -42,6 +42,7 @@ public class KalahFrame extends JFrame {
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(780, 480));
+        setMinimumSize(new Dimension(625, 250));
         pack(); // as small as possible
         setKeyCombinations();
         setVisible(true);
