@@ -3,18 +3,13 @@ package kalah.view;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.Observable;
 import java.util.Observer;
 import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import kalah.model.Board;
 import kalah.model.BoardMediator;
 
 public class KalahFrame extends JFrame {

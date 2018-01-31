@@ -2,6 +2,7 @@ package kalah.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -11,7 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.border.Border;
+import javax.swing.plaf.ComponentUI;
 import kalah.model.Board;
 import kalah.model.BoardMediator;
 
@@ -65,15 +66,15 @@ public class BoardPanel extends JPanel implements Observer {
             if (i == maxPitNum || i == gameBoard.getPitsPerPlayer() + 1) {
                 // If the pit is a store, take the whole columns space.
                 column.setLayout(new GridLayout(1, 1));
-                column.add(new Pit(i));
+                column.add(new Pit(i, true));
 
                 // Set the upperRowNum as well as the lowerRowNum to the same.
                 upperRowNum = Integer.toString(i);
                 lowerRowNum = upperRowNum;
             } else {
                 column.setLayout(new GridLayout(2, 1));
-                column.add(new Pit(i));
-                column.add(new Pit(getOpposingPitNum(i)));
+                column.add(new Pit(i, false));
+                column.add(new Pit(getOpposingPitNum(i), false));
 
                 // Set both the upperRowNum and lowerRowNum
                 upperRowNum = Integer.toString(i);
@@ -141,9 +142,14 @@ public class BoardPanel extends JPanel implements Observer {
 
         private JLabel seedsLabel;
         private int pitNum;
+        private boolean isStore;
+        private JPanel sourceMark;
+        private JPanel targetMark;
+        private final Color LIGHT_BLUE = new Color(49, 156, 255);
 
-        public Pit(int pitNum) {
+        public Pit(int pitNum, boolean isStore) {
             this.pitNum = pitNum;
+            this.isStore = isStore;
             this.setLayout(new BorderLayout());
             this.setBorder(BorderFactory.createLineBorder(DARK_WOOD, 1));
             this.setOpaque(false);
@@ -152,8 +158,10 @@ public class BoardPanel extends JPanel implements Observer {
                     SwingConstants.CENTER);
             this.add(seedsLabel, BorderLayout.CENTER);
 
+            renderMarkings();
+
             // Add a MouseListener only if this is a humans pit.
-            if (isHumanPit()) {
+            if (isHumanPit() && !isStore()) {
                 this.seedsLabel.addMouseListener(new MouseAdapter() {
                     /**
                      * {@inheritDoc}
@@ -182,10 +190,90 @@ public class BoardPanel extends JPanel implements Observer {
             }
         }
 
-        private boolean isHumanPit() {
-            return this.pitNum <= gameBoard.getPitsPerPlayer();
+        public void showSourceMark() {
+            sourceMark.setVisible(true);
         }
 
+        public void showTargetMark() {
+            targetMark.setVisible(true);
+        }
+
+        private boolean isHumanPit() {
+            return this.pitNum <= gameBoard.getPitsPerPlayer() + 1;
+        }
+
+        private boolean isStore() {
+            return this.isStore;
+        }
+
+        private void renderMarkings() {
+            this.sourceMark = new JPanel();
+            this.targetMark = new JPanel();
+            this.sourceMark.setBackground(LIGHT_BLUE);
+            this.targetMark.setBackground(LIGHT_BLUE);
+
+            if (this.isStore()) {
+                if (isHumanPit()) {
+                    this.add(sourceMark, BorderLayout.SOUTH);
+                    this.add(targetMark, BorderLayout.NORTH);
+                } else {
+                    this.add(sourceMark, BorderLayout.NORTH);
+                    this.add(targetMark, BorderLayout.SOUTH);
+                }
+            } else {
+                if (isHumanPit()) {
+                    this.add(sourceMark, BorderLayout.WEST);
+                    this.add(targetMark, BorderLayout.EAST);
+                } else {
+                    this.add(sourceMark, BorderLayout.EAST);
+                    this.add(targetMark, BorderLayout.WEST);
+                }
+            }
+
+            this.sourceMark.setVisible(false);
+            this.targetMark.setVisible(false);
+        }
+
+        /**
+         * Calls the UI delegate's paint method, if the UI delegate
+         * is non-<code>null</code>.  We pass the delegate a copy of the
+         * <code>Graphics</code> object to protect the rest of the
+         * paint code from irrevocable changes
+         * (for example, <code>Graphics.translate</code>).
+         * <p>
+         * If you override this in a subclass you should not make permanent
+         * changes to the passed in <code>Graphics</code>. For example, you
+         * should not alter the clip <code>Rectangle</code> or modify the
+         * transform. If you need to do these operations you may find it
+         * easier to create a new <code>Graphics</code> from the passed in
+         * <code>Graphics</code> and manipulate it. Further, if you do not
+         * invoker super's implementation you must honor the opaque property,
+         * that is
+         * if this component is opaque, you must completely fill in the background
+         * in a non-opaque color. If you do not honor the opaque property you
+         * will likely see visual artifacts.
+         * <p>
+         * The passed in <code>Graphics</code> object might
+         * have a transform other than the identify transform
+         * installed on it.  In this case, you might get
+         * unexpected results if you cumulatively apply
+         * another transform.
+         *
+         * @param g the <code>Graphics</code> object to protect
+         * @see #paint
+         * @see ComponentUI
+         */
+        @Override
+        protected void paintComponent(Graphics g) {
+            // Call it's super paintComponent in order to paint the rest.
+            super.paintComponent(g);
+
+            if (gameBoard.sourcePitOfLastMove() == this.pitNum) {
+                showSourceMark();
+            } else if (gameBoard.targetPitOfLastMove() == this.pitNum) {
+                showTargetMark();
+            }
+        }
     }
 
 }
