@@ -11,6 +11,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 import kalah.model.Board;
 import kalah.model.BoardMediator;
 
@@ -26,7 +27,7 @@ public class BoardPanel extends JPanel implements Observer {
     private JPanel lowerNumberPanel;
     private JPanel pitsPanel;
 
-    private int columns;
+    private int numberOfColumns;
 
     public BoardPanel(BoardMediator boardMediator) {
         this.boardMediator = boardMediator;
@@ -40,52 +41,79 @@ public class BoardPanel extends JPanel implements Observer {
     private void renderBoard() {
         this.removeAll();
         this.gameBoard = this.boardMediator.getGame();
-        columns = gameBoard.getPitsPerPlayer() + 2;
+        numberOfColumns = gameBoard.getPitsPerPlayer() + 2;
+        int maxPitNum = (gameBoard.getPitsPerPlayer() + 1) * 2;
 
         upperNumberPanel = new JPanel();
         lowerNumberPanel = new JPanel();
         upperNumberPanel.setBackground(DARK_WOOD);
         lowerNumberPanel.setBackground(DARK_WOOD);
-        upperNumberPanel.setLayout(new GridLayout(1, columns));
-        lowerNumberPanel.setLayout(new GridLayout(1, columns));
+        upperNumberPanel.setLayout(new GridLayout(1, numberOfColumns));
+        lowerNumberPanel.setLayout(new GridLayout(1, numberOfColumns));
 
         pitsPanel = new JPanel();
-        pitsPanel.setLayout(new GridLayout(2, columns));
+        pitsPanel.setLayout(new GridLayout(1, numberOfColumns));
         pitsPanel.setBackground(LIGHT_WOOD);
 
         // Adding pits and stores.
-        for (int i = (gameBoard.getPitsPerPlayer() + 1) * 2; i > gameBoard.getPitsPerPlayer() + 1; i--) {
-            pitsPanel.add(new Pit(i));
-            JLabel rowNumberLabel = new JLabel(Integer.toString(i), 0);
-            rowNumberLabel.setForeground(LIGHT_WOOD);
-            upperNumberPanel.add(rowNumberLabel, BorderLayout.CENTER);
+        for (int i = maxPitNum; i >= gameBoard.getPitsPerPlayer() + 1; i--) {
+            JPanel column = new JPanel();
+            column.setOpaque(false);
+            String upperRowNum;
+            String lowerRowNum;
 
-            if (i == columns) {
-                rowNumberLabel = new JLabel(Integer.toString(i - 1), 0);
-                rowNumberLabel.setForeground(LIGHT_WOOD);
-                upperNumberPanel.add(rowNumberLabel, BorderLayout.CENTER);
+            if (i == maxPitNum || i == gameBoard.getPitsPerPlayer() + 1) {
+                // If the pit is a store, take the whole columns space.
+                column.setLayout(new GridLayout(1, 1));
+                column.add(new Pit(i));
+
+                // Set the upperRowNum as well as the lowerRowNum to the same.
+                upperRowNum = Integer.toString(i);
+                lowerRowNum = upperRowNum;
+            } else {
+                column.setLayout(new GridLayout(2, 1));
+                column.add(new Pit(i));
+                column.add(new Pit(getOpposingPitNum(i)));
+
+                // Set both the upperRowNum and lowerRowNum
+                upperRowNum = Integer.toString(i);
+                lowerRowNum = Integer.toString(getOpposingPitNum(i));
             }
-        }
-        pitsPanel.add(new JPanel());
-        pitsPanel.add(new JPanel());
+            pitsPanel.add(column);
 
-        // Adding pits and stores.
-        JLabel rowNumberLabel = new JLabel(Integer.toString((gameBoard.getPitsPerPlayer() + 1) * 2), 0);
-        rowNumberLabel.setForeground(LIGHT_WOOD);
-        lowerNumberPanel.add(rowNumberLabel, BorderLayout.CENTER);
-        for (int i = 1; i <= gameBoard.getPitsPerPlayer() + 1; i++) {
-            pitsPanel.add(new Pit(i));
-            rowNumberLabel = new JLabel(Integer.toString(i), 0);
-            rowNumberLabel.setForeground(LIGHT_WOOD);
-            lowerNumberPanel.add(rowNumberLabel, BorderLayout.CENTER);
-        }
+            // Add row number labels.
+            JLabel upperRowNumberLabel = new JLabel(upperRowNum, 0);
+            upperRowNumberLabel.setForeground(LIGHT_WOOD);
+            upperNumberPanel.add(upperRowNumberLabel, BorderLayout.CENTER);
 
-        // Adding number labels.
-        //for (int i = 1; i <= board.getPitsPerPlayer();
+            // Add row number labels.
+            JLabel lowerRowNumberLabel = new JLabel(lowerRowNum, 0);
+            lowerRowNumberLabel.setForeground(LIGHT_WOOD);
+            lowerNumberPanel.add(lowerRowNumberLabel, BorderLayout.CENTER);
+        }
 
         this.add(upperNumberPanel, BorderLayout.NORTH);
         this.add(pitsPanel, BorderLayout.CENTER);
         this.add(lowerNumberPanel,  BorderLayout.SOUTH);
+    }
+
+    /**
+     * Calculates the pit number of the opposing pit for a given number.
+     *
+     * @param pit The pit number whose opposing pit number should be
+     * calculated.
+     * @return The opposing pit number.
+     */
+    // TODO: Duplicate in Board Implementation.
+    private int getOpposingPitNum(int pit) {
+        int maxPitNum = (gameBoard.getPitsPerPlayer() + 1) * 2;
+        if (pit == maxPitNum) {
+            return maxPitNum / 2;
+        } else if (pit == maxPitNum / 2) {
+            return maxPitNum;
+        } else {
+            return maxPitNum - pit;
+        }
     }
 
     /**
