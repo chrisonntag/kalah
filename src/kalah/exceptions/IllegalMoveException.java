@@ -6,6 +6,8 @@ package kalah.exceptions;
  */
 public class IllegalMoveException extends RuntimeException {
 
+    private static final long serialVersionUID = 5257933270451043028L;
+
     /**
      * Instantiates a {@link IllegalMoveException}.
      *
