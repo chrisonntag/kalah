@@ -62,7 +62,11 @@ public class ControlPanel extends JPanel implements Observer {
         newButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                newGame();
+                int pits = (Integer) pitsCombo.getSelectedItem();
+                int seeds = (Integer) seedsCombo.getSelectedItem();
+                int level = (Integer) levelCombo.getSelectedItem();
+
+                boardMediator.newGame(pits, seeds, level);
             }
         });
 
@@ -121,6 +125,9 @@ public class ControlPanel extends JPanel implements Observer {
      */
     @Override
     public void update(Observable observable, Object data) {
+        // Reset undo button in case of a new game.
+        undoButton.setEnabled(false);
+
         // Reset timer.
         timer.stop();
         timer = createTimer(1000);
@@ -154,17 +161,6 @@ public class ControlPanel extends JPanel implements Observer {
         }
 
         return range;
-    }
-
-    private void newGame() {
-        int pits = (Integer) pitsCombo.getSelectedItem();
-        int seeds = (Integer) seedsCombo.getSelectedItem();
-        int level = (Integer) levelCombo.getSelectedItem();
-
-        String message = String.format("Start a new game with %d pits and %d seeds per Player?", pits, seeds);
-        if (UserCommunication.showConfirmDialog(message, "New Game") == 0) {
-            boardMediator.newGame(pits, seeds, level);
-        }
     }
 
     private void quitApplication() {

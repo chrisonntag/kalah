@@ -2,6 +2,7 @@ package kalah.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
@@ -153,9 +154,14 @@ public class BoardPanel extends JPanel implements Observer {
             this.setLayout(new BorderLayout());
             this.setBorder(BorderFactory.createLineBorder(DARK_WOOD, 1));
             this.setOpaque(false);
-            this.seedsLabel =
-                new JLabel(Integer.toString(gameBoard.getSeeds(pitNum)),
-                    SwingConstants.CENTER);
+            this.seedsLabel
+                = new JLabel(Integer.toString(gameBoard.getSeeds(pitNum)),
+                SwingConstants.CENTER);
+
+            int optimizedFontSize = (seedsLabel.getFont().getSize() - 4) * 2;
+            Font pitFont = new Font(seedsLabel.getFont().getName(), Font.BOLD,
+                optimizedFontSize);
+            this.seedsLabel.setFont(pitFont);
             this.add(seedsLabel, BorderLayout.CENTER);
 
             renderMarkings();
@@ -249,9 +255,9 @@ public class BoardPanel extends JPanel implements Observer {
          * <code>Graphics</code> and manipulate it. Further, if you do not
          * invoker super's implementation you must honor the opaque property,
          * that is
-         * if this component is opaque, you must completely fill in the background
-         * in a non-opaque color. If you do not honor the opaque property you
-         * will likely see visual artifacts.
+         * if this component is opaque, you must completely fill in the
+         * background in a non-opaque color. If you do not honor the opaque
+         * property you will likely see visual artifacts.
          * <p>
          * The passed in <code>Graphics</code> object might
          * have a transform other than the identify transform

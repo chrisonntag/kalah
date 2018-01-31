@@ -18,16 +18,18 @@ public class BoardMediator extends Observable {
      * Don't need a thread-safe deque here --> Use ArrayDeque.
      */
     private Deque<Board> gameStack;
-    private Thread machineThread;
+    private Thread machineThread = new Thread();
 
     public BoardMediator() {
-        machineThread = new Thread();
         gameStack = new ArrayDeque<>();
         newGame();
     }
 
     public void newGame() {
-        Board game = new BoardImpl(openingPlayer, pitsPerPlayer, seedsPerPit, level);
+        this.killMachineThread();
+
+        Board game = new BoardImpl(openingPlayer, pitsPerPlayer, seedsPerPit,
+            level);
         gameStack.clear();
         gameStack.push(game);
         setChanged();
@@ -35,13 +37,20 @@ public class BoardMediator extends Observable {
     }
 
     public void newGame(int pits, int seeds, int level) {
+        this.gameStack.clear();
         this.pitsPerPlayer = pits;
         this.seedsPerPit = seeds;
         this.level = level;
-        newGame();
+
+        String message = String.format("Start a new game with %d pits and %d "
+            + "seeds per Player?", pits, seeds);
+        if (UserCommunication.showConfirmDialog(message, "New Game") == 0) {
+            newGame();
+        }
     }
 
     public void switchPlayers() {
+        this.killMachineThread();
         if (gameStack.size() > 0) {
             openingPlayer = Player.getOpponent(openingPlayer);
             newGame();
@@ -55,6 +64,7 @@ public class BoardMediator extends Observable {
     }
 
     public void doUndo() {
+        this.killMachineThread();
         if (gameStack.size() > 0) {
             if (gameStack.pop().getOpeningPlayer() == Player.HUMAN) {
                 gameStack.pop();
@@ -66,6 +76,7 @@ public class BoardMediator extends Observable {
     }
 
     public void setLevel(int level) {
+        this.killMachineThread();
         this.level = level;
 
         if (gameStack.size() > 0) {
@@ -152,6 +163,12 @@ public class BoardMediator extends Observable {
             System.out.format(UserCommunication.LOOSE,
                 gameStack.peek().getSeedsOfPlayer(Player.MACHINE),
                 gameStack.peek().getSeedsOfPlayer(Player.HUMAN));
+        }
+    }
+
+    private void killMachineThread() {
+        if (machineThread != null && machineThread.isAlive()) {
+            machineThread.stop();
         }
     }
 
