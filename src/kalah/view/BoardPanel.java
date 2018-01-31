@@ -11,9 +11,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.plaf.LabelUI;
 import kalah.model.Board;
-import kalah.model.BoardImpl;
 import kalah.model.BoardMediator;
 
 public class BoardPanel extends JPanel implements Observer {
@@ -34,12 +32,12 @@ public class BoardPanel extends JPanel implements Observer {
         this.boardMediator = boardMediator;
         gameBoard = this.boardMediator.getGame();
         this.setLayout(new BorderLayout());
-        paintBoard();
+        renderBoard();
 
         setVisible(true);
     }
 
-    private void paintBoard() {
+    private void renderBoard() {
         this.removeAll();
         this.gameBoard = this.boardMediator.getGame();
         columns = gameBoard.getPitsPerPlayer() + 2;
@@ -105,7 +103,7 @@ public class BoardPanel extends JPanel implements Observer {
         if (data instanceof Board) {
             this.gameBoard = (Board) data;
 
-            paintBoard();
+            renderBoard();
             this.repaint();
             this.revalidate();
         }
