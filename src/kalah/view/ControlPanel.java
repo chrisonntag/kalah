@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import kalah.model.Board;
 import kalah.model.BoardMediator;
+import kalah.util.UserCommunication;
 
 /**
  * The {@link ControlPanel} class represents the part of the Kalah Application
@@ -49,6 +50,13 @@ public class ControlPanel extends JPanel implements Observer {
         seedsCombo.setSelectedItem(Board.DEFAULT_SEEDS_PER_PIT);
         levelCombo.setSelectedItem(BoardMediator.DEFAULT_LEVEL);
 
+        this.newButton.setToolTipText(UserCommunication.HELP_NEW);
+        this.switchButton.setToolTipText(UserCommunication.SWITCH_HELP);
+        this.undoButton.setToolTipText(UserCommunication.UNDO_HELP);
+        this.quitButton.setToolTipText(UserCommunication.QUIT_HELP);
+        this.seedsCombo.setToolTipText(UserCommunication.SEEDS_HELP);
+        this.pitsCombo.setToolTipText(UserCommunication.PITS_HELP);
+        this.levelCombo.setToolTipText(UserCommunication.LEVEL_HELP);
         this.undoButton.setEnabled(false);
 
         timer = createTimer(1000, timeLabel);

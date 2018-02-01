@@ -63,6 +63,16 @@ public final class UserCommunication {
     public static final String INVALID_MOVE = "Invalid move!";
     public static final String LEVEL_RANGE = "Level must be between 1 and 7.";
 
+    public static final String HELP_NEW = "Start a new game with the values set"
+        + " in the boxes besides.";
+    public static final String SWITCH_HELP = "Start a new game where the "
+        + "second player of the last game begins.";
+    public static final String UNDO_HELP = "Undo your last move.";
+    public static final String QUIT_HELP = "Exit the game.";
+    public static final String SEEDS_HELP = "Initial seeds per pit.";
+    public static final String PITS_HELP = "Initial pits per player.";
+    public static final String LEVEL_HELP = "Difficulty level.";
+
     /**
      * Shows a {@link JOptionPane} with an Ok or Cancel dialog to the user.
      *
