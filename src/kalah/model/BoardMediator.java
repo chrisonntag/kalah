@@ -1,6 +1,5 @@
 package kalah.model;
 
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion.User;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Observable;
@@ -82,7 +81,8 @@ public class BoardMediator extends Observable {
                 machineMove();
             }
         } else {
-            UserCommunication.showConfirmDialog("Error!", getError(300));
+            UserCommunication.showConfirmDialog("Error!",
+                UserCommunication.NO_GAME_STARTED);
         }
     }
 
@@ -109,7 +109,6 @@ public class BoardMediator extends Observable {
      * @param level The level to be set.
      */
     public void setLevel(int level) {
-        // TODO: check this.
         this.killMachineThread();
         this.level = level;
 
@@ -135,10 +134,12 @@ public class BoardMediator extends Observable {
                 e.printStackTrace();
                 return;
             } catch (IllegalMoveException e) {
-                UserCommunication.showConfirmDialog("Error!", e.getMessage());
+                UserCommunication.showConfirmDialog("Error!",
+                    e.getMessage());
                 return;
             } catch (IllegalStateException e) {
-                UserCommunication.showConfirmDialog("Error!", getError(402));
+                UserCommunication.showConfirmDialog("Error!",
+                    UserCommunication.INVALID_MOVE);
                 return;
             }
 
@@ -150,10 +151,12 @@ public class BoardMediator extends Observable {
                     getWinner();
                 }
             } else {
-                UserCommunication.showConfirmDialog("Well done!", UserCommunication.MACHINE_MISS);
+                UserCommunication.showConfirmDialog("Well done!",
+                    UserCommunication.MACHINE_MISS);
             }
         } else {
-            UserCommunication.showConfirmDialog("Error!", getError(300));
+            UserCommunication.showConfirmDialog("Error!",
+                UserCommunication.NO_GAME_STARTED);
         }
     }
 
@@ -175,7 +178,8 @@ public class BoardMediator extends Observable {
                     long modelTime = 3000 - (end - begin);
                     if (modelTime > 0) {
                         // Add a random delay between one and three seconds.
-                        int delay = (int) (Math.random() * (3000 - 1000)) + 1000;
+                        int delay = (int) (Math.random() * (3000 - 1000))
+                            + 1000;
                         System.out.println(delay);
                         delay(delay);
                     }
@@ -184,12 +188,15 @@ public class BoardMediator extends Observable {
                     setChanged();
                     notifyObservers(game);
 
-                    String message = String.format(UserCommunication.MACHINE_MOVE,
+                    String message
+                        = String.format(UserCommunication.MACHINE_MOVE,
                         game.sourcePitOfLastMove(), game.targetPitOfLastMove());
-                    UserCommunication.showConfirmDialog("Machines Move", message);
+                    UserCommunication.showConfirmDialog("Machines Move",
+                        message);
 
                     if (game.getOpeningPlayer() == Player.MACHINE) {
-                        UserCommunication.showConfirmDialog("Sorry!", UserCommunication.HUMAN_MISS);
+                        UserCommunication.showConfirmDialog("Sorry!",
+                            UserCommunication.HUMAN_MISS);
                     }
                 }
             }
@@ -259,18 +266,6 @@ public class BoardMediator extends Observable {
      */
     public Board getGame() {
         return gameStack.peek();
-    }
-
-    /**
-     * Fetches the belonging error message to a given code and returns it as a
-     * string in order to work in text based applications as well as be reusable
-     * in applications with a graphical user interface.
-     *
-     * @param code The error code as stated in {@link UserCommunication}.
-     * @return The error message.
-     */
-    private static String getError(int code) {
-        return UserCommunication.ERROR_MESSAGES.get(code);
     }
 
 }

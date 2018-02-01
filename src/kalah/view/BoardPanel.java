@@ -121,7 +121,6 @@ public class BoardPanel extends JPanel implements Observer {
      * calculated.
      * @return The opposing pit number.
      */
-    // TODO: Duplicate in Board Implementation.
     private int getOpposingPitNum(int pit) {
         int maxPitNum = (gameBoard.getPitsPerPlayer() + 1) * 2;
         if (pit == maxPitNum) {
@@ -164,7 +163,7 @@ public class BoardPanel extends JPanel implements Observer {
         private boolean isStore;
         private JPanel sourceMark;
         private JPanel targetMark;
-        private final Color LIGHT_BLUE = new Color(49, 156, 255);
+        private final Color lightBlue = new Color(49, 156, 255);
 
         /**
          *
@@ -244,8 +243,8 @@ public class BoardPanel extends JPanel implements Observer {
         private void renderMarkings() {
             this.sourceMark = new JPanel();
             this.targetMark = new JPanel();
-            this.sourceMark.setBackground(LIGHT_BLUE);
-            this.targetMark.setBackground(LIGHT_BLUE);
+            this.sourceMark.setBackground(lightBlue);
+            this.targetMark.setBackground(lightBlue);
 
             if (this.isStore()) {
                 if (isHumanPit()) {

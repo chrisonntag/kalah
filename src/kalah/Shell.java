@@ -61,10 +61,10 @@ public final class Shell {
                             quit = true;
                         }
                     } else {
-                        System.out.println(getError(302));
+                        System.out.println(UserCommunication.NO_VALID_COMMAND);
                     }
                 } else {
-                    System.out.println(getError(302));
+                    System.out.println(UserCommunication.NO_VALID_COMMAND);
                     showHelp();
                 }
 
@@ -99,7 +99,7 @@ public final class Shell {
                     level = args.get("level");
                     game.setLevel(level);
                 } else {
-                    System.out.println(getError(300));
+                    System.out.println(UserCommunication.NO_GAME_STARTED);
                 }
                 break;
             case 'M':
@@ -113,7 +113,7 @@ public final class Shell {
                         System.out.println(e.getMessage());
                         break;
                     } catch (IllegalStateException e) {
-                        System.out.println(getError(402));
+                        System.out.println(UserCommunication.INVALID_MOVE);
                         break;
                     }
 
@@ -128,7 +128,7 @@ public final class Shell {
                         System.out.println(UserCommunication.MACHINE_MISS);
                     }
                 } else {
-                    System.out.println(getError(300));
+                    System.out.println(UserCommunication.NO_GAME_STARTED);
                 }
                 break;
             case 'S':
@@ -142,14 +142,14 @@ public final class Shell {
                         machineMove();
                     }
                 } else {
-                    System.out.println(getError(300));
+                    System.out.println(UserCommunication.NO_GAME_STARTED);
                 }
                 break;
             case 'P':
                 if (game != null) {
                     System.out.println(game);
                 } else {
-                    System.out.println(getError(300));
+                    System.out.println(UserCommunication.NO_GAME_STARTED);
                 }
                 break;
             case 'H':
@@ -161,7 +161,7 @@ public final class Shell {
             case 'E':
                 break;
             default:
-                System.out.println(getError(200));
+                System.out.println(UserCommunication.ENTER_COMMAND);
                 break;
         }
 
@@ -190,7 +190,7 @@ public final class Shell {
                         pits = Integer.parseInt(args[1]);
                         seeds = Integer.parseInt(args[2]);
                     } catch (NumberFormatException nfe) {
-                        System.out.println(getError(100));
+                        System.out.println(UserCommunication.ALL_ARGS_NUM);
                         params.put("error", 1);
                         break;
                     }
@@ -198,7 +198,7 @@ public final class Shell {
                     params.put("pits", pits);
                     params.put("seeds", seeds);
                 } else {
-                    System.out.println(getError(101));
+                    System.out.println(UserCommunication.WRONG_ARGS_TWO_NUM);
                     params.put("error", 1);
                     break;
                 }
@@ -210,7 +210,7 @@ public final class Shell {
                     try {
                         pit = Integer.parseInt(args[1]);
                     } catch (NumberFormatException nfe) {
-                        System.out.println(getError(100));
+                        System.out.println(UserCommunication.ALL_ARGS_NUM);
                         params.put("error", 1);
                         break;
                     }
@@ -218,12 +218,12 @@ public final class Shell {
                     if (pit > 0) {
                         params.put("pit", pit);
                     } else {
-                        System.out.println(getError(103));
+                        System.out.println(UserCommunication.POSITIVE_NOT_ZERO);
                         params.put("error", 1);
                         break;
                     }
                 } else {
-                    System.out.println(getError(104));
+                    System.out.println(UserCommunication.WRONG_ARGS_ONE_NUM);
                     params.put("error", 1);
                 }
                 break;
@@ -235,15 +235,15 @@ public final class Shell {
                         if (level >= 1 && level <= 7) {
                             params.put("level", level);
                         } else {
-                            System.out.println(getError(403));
+                            System.out.println(UserCommunication.LEVEL_RANGE);
                             params.put("error", 1);
                         }
                     } catch (NumberFormatException nfe) {
-                        System.out.println(getError(105));
+                        System.out.println(UserCommunication.LEVEL_NUM);
                         params.put("error", 1);
                     }
                 } else {
-                    System.out.println(getError(201));
+                    System.out.println(UserCommunication.NEED_LEVEL);
                     params.put("error", 1);
                 }
                 break;
@@ -252,18 +252,6 @@ public final class Shell {
         }
 
         return params;
-    }
-
-    /**
-     * Fetches the belonging error message to a given code and returns it as a
-     * string in order to work in text based applications as well as be reusable
-     * in applications with a graphical user interface.
-     *
-     * @param code The error code as stated in {@link UserCommunication}.
-     * @return The error message.
-     */
-    private static String getError(int code) {
-        return "Error! " + UserCommunication.ERROR_MESSAGES.get(code);
     }
 
     /**

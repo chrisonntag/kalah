@@ -119,6 +119,7 @@ public class ControlPanel extends JPanel implements Observer {
      * the delay exceeds.
      *
      * @param delay The desired delay in milliseconds.
+     * @param label The label object which should be updated after the delay.
      * @return The created {@link Timer} object.
      */
     private Timer createTimer(int delay, JLabel label) {
@@ -186,7 +187,6 @@ public class ControlPanel extends JPanel implements Observer {
      * Exits the application as well as the JVM.
      */
     private void quitApplication() {
-        // TODO: Change to appropriate exit.
         System.exit(0);
     }
 
