@@ -3,7 +3,6 @@ package kalah.view;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.Observer;
 import javax.swing.AbstractAction;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
@@ -13,7 +12,6 @@ import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import kalah.model.BoardMediator;
 
 /**
  * This class represents the main frame for the Kalah GUI application, holding
@@ -39,10 +37,10 @@ public class KalahFrame extends JFrame {
         boardMediator = new BoardMediator();
 
         controlPanel = new ControlPanel(boardMediator);
-        JPanel gamePanel = new BoardPanel(boardMediator);
+        BoardPanel gamePanel = new BoardPanel(boardMediator);
 
-        boardMediator.addObserver((Observer) gamePanel);
-        boardMediator.addObserver((Observer) controlPanel);
+        boardMediator.addObserver(gamePanel);
+        boardMediator.addObserver(controlPanel);
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());

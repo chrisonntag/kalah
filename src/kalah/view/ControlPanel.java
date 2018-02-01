@@ -11,7 +11,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import kalah.model.Board;
-import kalah.model.BoardMediator;
 import kalah.util.UserCommunication;
 
 /**
@@ -40,7 +39,6 @@ public class ControlPanel extends JPanel implements Observer {
      */
     public ControlPanel(BoardMediator boardMediator) {
         this.boardMediator = boardMediator;
-        // new BoxLayout(this, BoxLayout.X_AXIS)
         this.setLayout(new FlowLayout());
 
         pitsCombo = new JComboBox<Integer>(generateComboboxRange(1, 12));

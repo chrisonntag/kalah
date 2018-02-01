@@ -1,9 +1,12 @@
-package kalah.model;
+package kalah.view;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Observable;
 import kalah.exceptions.IllegalMoveException;
+import kalah.model.Board;
+import kalah.model.BoardImpl;
+import kalah.model.Player;
 import kalah.util.UserCommunication;
 
 /**

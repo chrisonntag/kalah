@@ -15,7 +15,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.ComponentUI;
 import kalah.model.Board;
-import kalah.model.BoardMediator;
 
 /**
  * The {@link BoardPanel} class represents the part of the Kalah Application,
