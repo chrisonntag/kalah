@@ -165,11 +165,21 @@ public class BoardMediator extends Observable {
         machineThread = new Thread() {
             @Override
             public void run() {
-                delay(3000);
-
                 while (gameStack.peek().getOpeningPlayer() == Player.MACHINE
                     && !gameStack.peek().isGameOver()) {
+                    // Measure how long the model algorithm takes.
+                    long begin = System.currentTimeMillis();
                     Board game = gameStack.peek().machineMove();
+                    long end = System.currentTimeMillis();
+
+                    long modelTime = 3000 - (end - begin);
+                    if (modelTime > 0) {
+                        // Add a random delay between one and three seconds.
+                        int delay = (int) (Math.random() * (3000 - 1000)) + 1000;
+                        System.out.println(delay);
+                        delay(delay);
+                    }
+
                     gameStack.push(game);
                     setChanged();
                     notifyObservers(game);
