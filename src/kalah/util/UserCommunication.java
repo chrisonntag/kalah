@@ -59,7 +59,7 @@ public final class UserCommunication {
     public static final String NO_VALID_COMMAND = "No valid command.";
 
     public static final String NOT_YOUR_TURN = "It's not your turn.";
-    public static final String PIT_NOT_ON_GRID = "The pit is not on the grid!";
+    public static final String NOT_ON_GRID = "The pit is not on the grid!";
     public static final String INVALID_MOVE = "Invalid move!";
     public static final String LEVEL_RANGE = "Level must be between 1 and 7.";
 

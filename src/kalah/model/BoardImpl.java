@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import kalah.exceptions.IllegalMoveException;
 import kalah.minimax.Node;
+import kalah.util.UserCommunication;
 
 /**
  * {@inheritDoc}
@@ -103,9 +104,9 @@ public class BoardImpl implements Board {
     @Override
     public Board move(int pit) {
         if (isGameOver()) {
-            throw new IllegalMoveException("Error! The game is already over!");
+            throw new IllegalMoveException(UserCommunication.GAME_OVER);
         } else if (getOpeningPlayer() != Player.HUMAN) {
-            throw new IllegalMoveException("Error! It's not your turn.");
+            throw new IllegalMoveException(UserCommunication.NOT_YOUR_TURN);
         } else {
             if (pit <= (getPitsPerPlayer() + 1) * 2) {
                 if (getSeeds(pit) == 0 || getPit(pit).isStore()
@@ -114,8 +115,7 @@ public class BoardImpl implements Board {
                 }
             } else {
                 throw
-                    new IllegalArgumentException(
-                        "Error! The pit is not on the grid!");
+                    new IllegalArgumentException(UserCommunication.NOT_ON_GRID);
             }
         }
 

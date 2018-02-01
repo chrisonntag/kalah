@@ -28,6 +28,7 @@ public class KalahFrame extends JFrame {
     private static final int MIN_SIZE_WIDTH = 625;
     private static final int MIN_SIZE_HEIGHT = 250;
 
+    private ControlPanel controlPanel;
     private BoardMediator boardMediator;
 
     /**
@@ -37,7 +38,7 @@ public class KalahFrame extends JFrame {
         super("Kalah Game");
         boardMediator = new BoardMediator();
 
-        JPanel controlPanel = new ControlPanel(boardMediator);
+        controlPanel = new ControlPanel(boardMediator);
         JPanel gamePanel = new BoardPanel(boardMediator);
 
         boardMediator.addObserver((Observer) gamePanel);
@@ -57,7 +58,7 @@ public class KalahFrame extends JFrame {
         // its subcomponents.
         pack();
 
-        setKeyCombinations();
+        initializeKeyCombinations();
         setVisible(true);
     }
 
@@ -75,9 +76,9 @@ public class KalahFrame extends JFrame {
         });
     }
 
-    private void setKeyCombinations() {
+    private void initializeKeyCombinations() {
         JRootPane root = this.getRootPane();
-        InputMap inputMap = root.getInputMap(JComponent.WHEN_FOCUSED);
+        InputMap inputMap = root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         inputMap.put(KeyStroke.getKeyStroke("alt N"), "NEW");
         inputMap.put(KeyStroke.getKeyStroke("alt S"), "SWITCH");
@@ -86,7 +87,7 @@ public class KalahFrame extends JFrame {
 
         root.getActionMap().put("NEW", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                boardMediator.newGame();
+                controlPanel.onNewButtonClicked();
             }
         });
 
@@ -98,7 +99,7 @@ public class KalahFrame extends JFrame {
 
         root.getActionMap().put("UNDO", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                boardMediator.doUndo();
+                controlPanel.onUndoButtonClicked();
             }
         });
 

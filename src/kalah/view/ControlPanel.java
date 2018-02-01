@@ -68,17 +68,13 @@ public class ControlPanel extends JPanel implements Observer {
     }
 
     /**
-     * Sets up action listeners for all added {@link javax.swing.JComponent}.
+     * Sets up action listeners for all added <code>JComponents</code>.
      */
     private void initializeActionListeners() {
         newButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int pits = (Integer) pitsCombo.getSelectedItem();
-                int seeds = (Integer) seedsCombo.getSelectedItem();
-                int level = (Integer) levelCombo.getSelectedItem();
-
-                boardMediator.newGame(pits, seeds, level);
+                onNewButtonClicked();
             }
         });
 
@@ -99,9 +95,7 @@ public class ControlPanel extends JPanel implements Observer {
         undoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!boardMediator.isStackEmpty()) {
-                    boardMediator.doUndo();
-                }
+                onUndoButtonClicked();
             }
         });
 
@@ -112,6 +106,30 @@ public class ControlPanel extends JPanel implements Observer {
                 boardMediator.setLevel(level);
             }
         });
+    }
+
+    /**
+     * Starts a new game with the current values set by the user.
+     */
+    void onNewButtonClicked() {
+        int pits = (Integer) pitsCombo.getSelectedItem();
+        int seeds = (Integer) seedsCombo.getSelectedItem();
+        int level = (Integer) levelCombo.getSelectedItem();
+
+        boardMediator.newGame(pits, seeds, level);
+        undoButton.setEnabled(false);
+    }
+
+    /**
+     * Undo's the last move if possible.
+     */
+    void onUndoButtonClicked() {
+        if (boardMediator.isUndoAllowed()) {
+            boardMediator.doUndo();
+            if (!boardMediator.isUndoAllowed()) {
+                undoButton.setEnabled(false);
+            }
+        }
     }
 
     /**
@@ -145,9 +163,6 @@ public class ControlPanel extends JPanel implements Observer {
      */
     @Override
     public void update(Observable observable, Object data) {
-        // Reset undo button in case of a new game.
-        undoButton.setEnabled(false);
-
         // Reset timer.
         timer.stop();
         timer = createTimer(1000, timeLabel);
@@ -155,7 +170,7 @@ public class ControlPanel extends JPanel implements Observer {
         timer.start();
 
         // Check if undo is possible.
-        if (!boardMediator.isStackEmpty()) {
+        if (boardMediator.isUndoAllowed()) {
             undoButton.setEnabled(true);
         }
     }

@@ -92,8 +92,9 @@ public class BoardMediator extends Observable {
      */
     public void doUndo() {
         this.killMachineThread();
-        if (gameStack.size() > 0) {
-            if (gameStack.pop().getOpeningPlayer() == Player.HUMAN) {
+        if (gameStack.size() > 1) {
+            gameStack.pop();
+            while (gameStack.peek().getOpeningPlayer() == Player.MACHINE) {
                 gameStack.pop();
             }
 
@@ -180,7 +181,6 @@ public class BoardMediator extends Observable {
                         // Add a random delay between one and three seconds.
                         int delay = (int) (Math.random() * (3000 - 1000))
                             + 1000;
-                        System.out.println(delay);
                         delay(delay);
                     }
 
@@ -191,6 +191,7 @@ public class BoardMediator extends Observable {
                     String message
                         = String.format(UserCommunication.MACHINE_MOVE,
                         game.sourcePitOfLastMove(), game.targetPitOfLastMove());
+
                     UserCommunication.showConfirmDialog("Machines Move",
                         message);
 
@@ -251,12 +252,13 @@ public class BoardMediator extends Observable {
     }
 
     /**
-     * Checks if the {@link #gameStack} contains any items.
+     * Checks if the {@link #gameStack} contains more than it's initial
+     * game {@link Board}.
      *
-     * @return A boolean value if the {@link #gameStack} is empty or not.
+     * @return A boolean value if the {@link #gameStack} contains more than one.
      */
-    public boolean isStackEmpty() {
-        return gameStack.isEmpty();
+    public boolean isUndoAllowed() {
+        return gameStack.size() > 1;
     }
 
     /**
