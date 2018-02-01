@@ -1,5 +1,6 @@
 package kalah.model;
 
+import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion.User;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Observable;
@@ -62,7 +63,7 @@ public class BoardMediator extends Observable {
 
         String message = String.format("Start a new game with %d pits and %d "
             + "seeds per Player?", pits, seeds);
-        if (UserCommunication.showConfirmDialog(message, "New Game") == 0) {
+        if (UserCommunication.showYesNoDialog("New Game", message) == 0) {
             newGame();
         }
     }
@@ -81,7 +82,7 @@ public class BoardMediator extends Observable {
                 machineMove();
             }
         } else {
-            System.out.println(getError(300));
+            UserCommunication.showConfirmDialog("Error!", getError(300));
         }
     }
 
@@ -117,6 +118,12 @@ public class BoardMediator extends Observable {
         }
     }
 
+    /**
+     * Executes a human move on the first element of the {@link #gameStack}.
+     *
+     * @param pit The number of the human pit whose contained seeds will be
+     * sowed counter-clockwise.
+     */
     public void humanMove(int pit) {
         if (gameStack.size() > 0) {
             try {
@@ -124,11 +131,15 @@ public class BoardMediator extends Observable {
                 gameStack.push(game);
                 setChanged();
                 notifyObservers(game);
-            } catch (IllegalMoveException
-                | IllegalArgumentException e) {
-                System.out.println(e.getMessage());
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                return;
+            } catch (IllegalMoveException e) {
+                UserCommunication.showConfirmDialog("Error!", e.getMessage());
+                return;
             } catch (IllegalStateException e) {
-                System.out.println(getError(402));
+                UserCommunication.showConfirmDialog("Error!", getError(402));
+                return;
             }
 
             if (gameStack.peek().isGameOver()) {
@@ -139,10 +150,10 @@ public class BoardMediator extends Observable {
                     getWinner();
                 }
             } else {
-                System.out.println(UserCommunication.MACHINE_MISS);
+                UserCommunication.showConfirmDialog("Well done!", UserCommunication.MACHINE_MISS);
             }
         } else {
-            System.out.println(getError(300));
+            UserCommunication.showConfirmDialog("Error!", getError(300));
         }
     }
 
@@ -163,11 +174,12 @@ public class BoardMediator extends Observable {
                     setChanged();
                     notifyObservers(game);
 
-                    System.out.format(UserCommunication.MACHINE_MOVE,
+                    String message = String.format(UserCommunication.MACHINE_MOVE,
                         game.sourcePitOfLastMove(), game.targetPitOfLastMove());
+                    UserCommunication.showConfirmDialog("Machines Move", message);
 
                     if (game.getOpeningPlayer() == Player.MACHINE) {
-                        System.out.println(UserCommunication.HUMAN_MISS);
+                        UserCommunication.showConfirmDialog("Sorry!", UserCommunication.HUMAN_MISS);
                     }
                 }
             }
@@ -190,16 +202,22 @@ public class BoardMediator extends Observable {
      */
     private void getWinner() {
         if (gameStack.peek().getWinner() == Player.NONE) {
-            System.out.format(UserCommunication.STALEMATE,
+            String message = String.format(UserCommunication.STALEMATE,
                 gameStack.peek().getSeedsOfPlayer(Player.HUMAN));
+
+            UserCommunication.showConfirmDialog("Sorry!", message);
         } else if (gameStack.peek().getWinner() == Player.HUMAN) {
-            System.out.format(UserCommunication.WIN,
+            String message = String.format(UserCommunication.WIN,
                 gameStack.peek().getSeedsOfPlayer(Player.HUMAN),
                 gameStack.peek().getSeedsOfPlayer(Player.MACHINE));
+
+            UserCommunication.showConfirmDialog("Well done!", message);
         } else {
-            System.out.format(UserCommunication.LOOSE,
+            String message = String.format(UserCommunication.LOOSE,
                 gameStack.peek().getSeedsOfPlayer(Player.MACHINE),
                 gameStack.peek().getSeedsOfPlayer(Player.HUMAN));
+
+            UserCommunication.showConfirmDialog("Sorry!", message);
         }
     }
 
@@ -242,7 +260,7 @@ public class BoardMediator extends Observable {
      * @return The error message.
      */
     private static String getError(int code) {
-        return "Error! " + UserCommunication.ERROR_MESSAGES.get(code);
+        return UserCommunication.ERROR_MESSAGES.get(code);
     }
 
 }

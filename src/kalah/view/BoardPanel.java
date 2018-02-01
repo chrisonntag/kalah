@@ -235,6 +235,12 @@ public class BoardPanel extends JPanel implements Observer {
             return this.isStore;
         }
 
+        /**
+         * Adds source and target markings on the pits NORTH or SOUTH, or
+         * EAST or WEST side depending on where on the board the pit is located.
+         * The markings are then used to show the user where the last moves
+         * source and target pits are located.
+         */
         private void renderMarkings() {
             this.sourceMark = new JPanel();
             this.targetMark = new JPanel();
@@ -259,6 +265,7 @@ public class BoardPanel extends JPanel implements Observer {
                 }
             }
 
+            // Set them invisible by default - only show them after a move.
             this.sourceMark.setVisible(false);
             this.targetMark.setVisible(false);
         }
@@ -294,9 +301,11 @@ public class BoardPanel extends JPanel implements Observer {
          */
         @Override
         protected void paintComponent(Graphics g) {
-            // Call it's super paintComponent in order to paint the rest.
+            // Call it's super paintComponent in order to paint the rest of
+            // the pit.
             super.paintComponent(g);
 
+            // Check if this pit is the source or target pit of the last move.
             if (gameBoard.sourcePitOfLastMove() == this.pitNum) {
                 showSourceMark();
             } else if (gameBoard.targetPitOfLastMove() == this.pitNum) {

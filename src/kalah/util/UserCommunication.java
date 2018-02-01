@@ -79,8 +79,14 @@ public final class UserCommunication {
             }
     };
 
-    public static int showConfirmDialog(String message, String title) {
-        return JOptionPane.showConfirmDialog(null, message, title, 0);
+    public static int showConfirmDialog(String title, String message) {
+        return JOptionPane.showConfirmDialog(null, message,
+            title, JOptionPane.OK_CANCEL_OPTION);
+    }
+
+    public static int showYesNoDialog(String title, String message) {
+        return JOptionPane.showConfirmDialog(null, message,
+            title, JOptionPane.YES_NO_OPTION);
     }
 
     private UserCommunication() { }

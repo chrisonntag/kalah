@@ -67,6 +67,9 @@ public class ControlPanel extends JPanel implements Observer {
         initializeActionListeners();
     }
 
+    /**
+     * Sets up action listeners for all added {@link javax.swing.JComponent}.
+     */
     private void initializeActionListeners() {
         newButton.addActionListener(new ActionListener() {
             @Override
@@ -179,6 +182,9 @@ public class ControlPanel extends JPanel implements Observer {
         return range;
     }
 
+    /**
+     * Exits the application as well as the JVM.
+     */
     private void quitApplication() {
         // TODO: Change to appropriate exit.
         System.exit(0);
