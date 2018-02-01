@@ -46,9 +46,12 @@ public final class UserCommunication {
         + "reaching pit %d.%n";
 
     public static final String ALL_ARGS_NUM = "All arguments must be numbers.";
-    public static final String WRONG_ARGS_TWO_NUM = "Wrong number of arguments: +2 numbers expected.";
-    public static final String WRONG_ARGS_ONE_NUM = "Wrong number of arguments: +1 numbers expected.";
-    public static final String POSITIVE_NOT_ZERO = "Parameter must be positive and not zero.";
+    public static final String WRONG_ARGS_TWO_NUM = "Wrong number of arguments:"
+        + " +2 numbers expected.";
+    public static final String WRONG_ARGS_ONE_NUM = "Wrong number of arguments:"
+        + " +1 numbers expected.";
+    public static final String POSITIVE_NOT_ZERO = "Parameter must be positive"
+        + " and not zero.";
     public static final String LEVEL_NUM = "The level must be a number.";
 
     public static final String ENTER_COMMAND = "You must enter a command.";
