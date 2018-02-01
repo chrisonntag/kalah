@@ -45,35 +45,70 @@ public final class UserCommunication {
     public static final String MACHINE_MOVE = "Machine chose pit %d with seeds "
         + "reaching pit %d.%n";
 
-    public static final String ALL_ARGS_NUM = "All arguments must be numbers.";
-    public static final String WRONG_ARGS_TWO_NUM = "Wrong number of arguments:"
-        + " +2 numbers expected.";
-    public static final String WRONG_ARGS_ONE_NUM = "Wrong number of arguments:"
-        + " +1 numbers expected.";
-    public static final String POSITIVE_NOT_ZERO = "Parameter must be positive"
-        + " and not zero.";
-    public static final String LEVEL_NUM = "The level must be a number.";
-
-    public static final String ENTER_COMMAND = "You must enter a command.";
-    public static final String NEED_LEVEL = "You must specify a level.";
-
+    /**
+     * Used when there has been no game started yet.
+     */
     public static final String NO_GAME_STARTED = "No game started yet.";
+
+    /**
+     * Tells the user that the game is already over.
+     */
     public static final String GAME_OVER = "The game is already over!";
-    public static final String NO_VALID_COMMAND = "No valid command.";
 
+    /**
+     * Displayed when it's not the users turn.
+     */
     public static final String NOT_YOUR_TURN = "It's not your turn.";
-    public static final String NOT_ON_GRID = "The pit is not on the grid!";
-    public static final String INVALID_MOVE = "Invalid move!";
-    public static final String LEVEL_RANGE = "Level must be between 1 and 7.";
 
+    /**
+     * Used when the pit is not on the grid.
+     */
+    public static final String NOT_ON_GRID = "The pit is not on the grid!";
+
+    /**
+     * Used when the move is invalid.
+     */
+    public static final String INVALID_MOVE = "Invalid move!";
+
+    /**
+     * Used as a help text for the 'New'-Button instantiating a new game.
+     */
     public static final String HELP_NEW = "Start a new game with the values set"
         + " in the boxes besides.";
+
+    /**
+     * Used as a help text for the 'Switch'-Button which starts a new game,
+     * but with switched players.
+     */
     public static final String SWITCH_HELP = "Start a new game where the "
         + "second player of the last game begins.";
+
+    /**
+     * Used as a help text for the undo button.
+     */
     public static final String UNDO_HELP = "Undo your last move.";
+
+    /**
+     * Used as a help text for the quit button.
+     */
     public static final String QUIT_HELP = "Exit the game.";
+
+    /**
+     * Used as a help text for a combobox where users can choose the initial
+     * number of seeds per pit.
+     */
     public static final String SEEDS_HELP = "Initial seeds per pit.";
+
+    /**
+     * Used as a help text for a combobox where users can choose the initial
+     * number pits per player.
+     */
     public static final String PITS_HELP = "Initial pits per player.";
+
+    /**
+     * Used as a help text for a combobox where users can choose the difficulty
+     * level.
+     */
     public static final String LEVEL_HELP = "Difficulty level.";
 
     /**

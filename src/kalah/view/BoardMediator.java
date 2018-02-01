@@ -15,7 +15,7 @@ import kalah.util.UserCommunication;
  * all registered Observers if the state of this {@link Board} changes.
  */
 public class BoardMediator extends Observable {
-    public static final int DEFAULT_LEVEL = 3;
+    private static final int DEFAULT_LEVEL = 3;
     private int level = DEFAULT_LEVEL;
     private int seedsPerPit = Board.DEFAULT_SEEDS_PER_PIT;
     private int pitsPerPlayer = Board.DEFAULT_PITS_PER_PLAYER;
@@ -248,6 +248,7 @@ public class BoardMediator extends Observable {
      * it would be to time-consuming to adapt present code to implement a
      * correct thread shutdown routine.
      */
+    @SuppressWarnings("deprecation")
     private void killMachineThread() {
         if (machineThread != null && machineThread.isAlive()) {
             machineThread.stop();
@@ -273,4 +274,12 @@ public class BoardMediator extends Observable {
         return gameStack.peek();
     }
 
+    /**
+     * Gets the default level for this board.
+     *
+     * @return The default level.
+     */
+    public static int getDefaultLevel() {
+        return DEFAULT_LEVEL;
+    }
 }

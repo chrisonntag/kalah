@@ -46,7 +46,7 @@ public class ControlPanel extends JPanel implements Observer {
         levelCombo = new JComboBox<Integer>(generateComboboxRange(1, 7));
         pitsCombo.setSelectedItem(Board.DEFAULT_PITS_PER_PLAYER);
         seedsCombo.setSelectedItem(Board.DEFAULT_SEEDS_PER_PIT);
-        levelCombo.setSelectedItem(BoardMediator.DEFAULT_LEVEL);
+        levelCombo.setSelectedItem(BoardMediator.getDefaultLevel());
 
         this.newButton.setToolTipText(UserCommunication.HELP_NEW);
         this.switchButton.setToolTipText(UserCommunication.SWITCH_HELP);

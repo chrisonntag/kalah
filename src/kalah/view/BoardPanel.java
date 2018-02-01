@@ -169,7 +169,7 @@ public class BoardPanel extends JPanel implements Observer {
          * @param pitNum The pit number of the pit (1-indexed).
          * @param isStore Is {@code true} if the pit is a players store.
          */
-        public Pit(int pitNum, boolean isStore) {
+        Pit(int pitNum, boolean isStore) {
             this.pitNum = pitNum;
             this.isStore = isStore;
             this.setLayout(new BorderLayout());
