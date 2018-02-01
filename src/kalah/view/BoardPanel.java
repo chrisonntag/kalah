@@ -17,6 +17,12 @@ import javax.swing.plaf.ComponentUI;
 import kalah.model.Board;
 import kalah.model.BoardMediator;
 
+/**
+ * The {@link BoardPanel} class represents the part of the Kalah Application,
+ * which holds all components regarding the actual "physical" board. Furthermore
+ * it has a reference to a {@link BoardMediator} object which acts as a link
+ * between the view/controller and the model.
+ */
 public class BoardPanel extends JPanel implements Observer {
 
     private static final Color LIGHT_WOOD = new Color(255, 206, 156);
@@ -31,6 +37,11 @@ public class BoardPanel extends JPanel implements Observer {
 
     private int numberOfColumns;
 
+    /**
+     * Instantiates a new {@link BoardPanel} derived from {@link JPanel}.
+     *
+     * @param boardMediator The link to the model part of the application.
+     */
     public BoardPanel(BoardMediator boardMediator) {
         this.boardMediator = boardMediator;
         gameBoard = this.boardMediator.getGame();
@@ -40,6 +51,10 @@ public class BoardPanel extends JPanel implements Observer {
         setVisible(true);
     }
 
+    /**
+     * Adds panels containing the pits and rows to indicate the pit numbers
+     * for each pits.
+     */
     private void renderBoard() {
         this.removeAll();
         this.gameBoard = this.boardMediator.getGame();
@@ -139,6 +154,9 @@ public class BoardPanel extends JPanel implements Observer {
         }
     }
 
+    /**
+     * This class represents a single pit in the board panel.
+     */
     class Pit extends JPanel {
 
         private JLabel seedsLabel;
@@ -148,6 +166,11 @@ public class BoardPanel extends JPanel implements Observer {
         private JPanel targetMark;
         private final Color LIGHT_BLUE = new Color(49, 156, 255);
 
+        /**
+         *
+         * @param pitNum The pit number of the pit (1-indexed).
+         * @param isStore Is {@code true} if the pit is a players store.
+         */
         public Pit(int pitNum, boolean isStore) {
             this.pitNum = pitNum;
             this.isStore = isStore;
@@ -196,11 +219,11 @@ public class BoardPanel extends JPanel implements Observer {
             }
         }
 
-        public void showSourceMark() {
+        private void showSourceMark() {
             sourceMark.setVisible(true);
         }
 
-        public void showTargetMark() {
+        private void showTargetMark() {
             targetMark.setVisible(true);
         }
 

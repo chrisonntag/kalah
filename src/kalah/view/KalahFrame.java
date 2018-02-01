@@ -12,6 +12,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import kalah.model.BoardMediator;
 
+/**
+ * This class represents the main frame for the Kalah GUI application, holding
+ * all graphical elements.
+ */
 public class KalahFrame extends JFrame {
 
     private JPanel mainPanel = new JPanel();
@@ -20,6 +24,9 @@ public class KalahFrame extends JFrame {
 
     private BoardMediator boardMediator;
 
+    /**
+     * Constructs a new {@link KalahFrame} object derived from {@link JFrame}.
+     */
     public KalahFrame() {
         super("Kalah Game");
         boardMediator = new BoardMediator();
@@ -43,6 +50,12 @@ public class KalahFrame extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * This is the main method which instantiates the {@link KalahFrame}
+     * extending a JFrame.
+     *
+     * @param args These are unused for this application.
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {

@@ -12,8 +12,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import kalah.model.Board;
 import kalah.model.BoardMediator;
-import kalah.util.UserCommunication;
 
+/**
+ * The {@link ControlPanel} class represents the part of the Kalah Application
+ * which holds all graphical components involved in controlling the application
+ * flow.
+ */
 public class ControlPanel extends JPanel implements Observer {
 
     private JButton newButton = new JButton("New");
@@ -28,6 +32,11 @@ public class ControlPanel extends JPanel implements Observer {
 
     private BoardMediator boardMediator;
 
+    /**
+     * Instantiates a new {@link ControlPanel} derived from {@link JPanel}.
+     *
+     * @param boardMediator The link to the model part of the application.
+     */
     public ControlPanel(BoardMediator boardMediator) {
         this.boardMediator = boardMediator;
         // new BoxLayout(this, BoxLayout.X_AXIS)
@@ -42,7 +51,7 @@ public class ControlPanel extends JPanel implements Observer {
 
         this.undoButton.setEnabled(false);
 
-        timer = createTimer(1000);
+        timer = createTimer(1000, timeLabel);
         timer.setInitialDelay(1000);
 
         this.add(newButton);
@@ -102,13 +111,20 @@ public class ControlPanel extends JPanel implements Observer {
         });
     }
 
-    private Timer createTimer(int delay) {
-        return new Timer(1000, new ActionListener() {
+    /**
+     * Creates a timer with a given delay, which updates a given label after
+     * the delay exceeds.
+     *
+     * @param delay The desired delay in milliseconds.
+     * @return The created {@link Timer} object.
+     */
+    private Timer createTimer(int delay, JLabel label) {
+        return new Timer(delay, new ActionListener() {
             private int time = 1;
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                timeLabel.setText(Integer.toString(time) + "s");
+                label.setText(Integer.toString(time) + "s");
                 time += 1;
             }
         });
@@ -130,7 +146,7 @@ public class ControlPanel extends JPanel implements Observer {
 
         // Reset timer.
         timer.stop();
-        timer = createTimer(1000);
+        timer = createTimer(1000, timeLabel);
         timer.setInitialDelay(1000);
         timer.start();
 

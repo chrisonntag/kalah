@@ -6,8 +6,12 @@ import java.util.Observable;
 import kalah.exceptions.IllegalMoveException;
 import kalah.util.UserCommunication;
 
+/**
+ * This class acts as the connecting link between the model part and the
+ * view part of the application. It holds a {@link Board} object and updates
+ * all registered Observers if the state of this {@link Board} changes.
+ */
 public class BoardMediator extends Observable {
-    // TODO: class secret?
     public static final int DEFAULT_LEVEL = 3;
     private int level = DEFAULT_LEVEL;
     private int seedsPerPit = Board.DEFAULT_SEEDS_PER_PIT;
@@ -20,11 +24,18 @@ public class BoardMediator extends Observable {
     private Deque<Board> gameStack;
     private Thread machineThread = new Thread();
 
+    /**
+     * Instantiates a new {@link BoardMediator}.
+     */
     public BoardMediator() {
         gameStack = new ArrayDeque<>();
         newGame();
     }
 
+    /**
+     * Clears the whole {@link #gameStack} and instantiates a new {@link Board}
+     * with set attributes.
+     */
     public void newGame() {
         this.killMachineThread();
 
@@ -36,6 +47,13 @@ public class BoardMediator extends Observable {
         notifyObservers(game);
     }
 
+    /**
+     * Starts a new game with given parameters.
+     *
+     * @param pits The desired pits per player for the new game.
+     * @param seeds The desired seeds per pit for the new game.
+     * @param level The desired level for the new game.
+     */
     public void newGame(int pits, int seeds, int level) {
         this.gameStack.clear();
         this.pitsPerPlayer = pits;
@@ -49,6 +67,10 @@ public class BoardMediator extends Observable {
         }
     }
 
+    /**
+     * Starts a new game with the player who started as a second player in the
+     * last game.
+     */
     public void switchPlayers() {
         this.killMachineThread();
         if (gameStack.size() > 0) {
@@ -63,6 +85,10 @@ public class BoardMediator extends Observable {
         }
     }
 
+    /**
+     * Removes all {@link Board} objects from the {@link #gameStack} until the
+     * last human move.
+     */
     public void doUndo() {
         this.killMachineThread();
         if (gameStack.size() > 0) {
@@ -75,7 +101,14 @@ public class BoardMediator extends Observable {
         }
     }
 
+    /**
+     * Sets a new level for the current and all following {@link Board} objects
+     * on the {@link #gameStack}.
+     *
+     * @param level The level to be set.
+     */
     public void setLevel(int level) {
+        // TODO: check this.
         this.killMachineThread();
         this.level = level;
 
@@ -113,6 +146,10 @@ public class BoardMediator extends Observable {
         }
     }
 
+    /**
+     * Executes a machine move on the board and displays appropriate messages
+     * which pit the machine took and if the other player must miss a turn.
+     */
     public void machineMove() {
         machineThread = new Thread() {
             @Override
@@ -148,8 +185,8 @@ public class BoardMediator extends Observable {
     }
 
     /**
-     * Checks the board for the winner of a game and prints an appropriate
-     * message on the screen.
+     * Checks the board for the winner of a game and displays an appropriate
+     * message to the user.
      */
     private void getWinner() {
         if (gameStack.peek().getWinner() == Player.NONE) {
@@ -166,16 +203,32 @@ public class BoardMediator extends Observable {
         }
     }
 
+    /**
+     * Kills the {@link #machineThread} which may be interrupted. This method
+     * uses the {@link Thread#stop()} method although it is deprecated because
+     * it would be to time-consuming to adapt present code to implement a
+     * correct thread shutdown routine.
+     */
     private void killMachineThread() {
         if (machineThread != null && machineThread.isAlive()) {
             machineThread.stop();
         }
     }
 
+    /**
+     * Checks if the {@link #gameStack} contains any items.
+     *
+     * @return A boolean value if the {@link #gameStack} is empty or not.
+     */
     public boolean isStackEmpty() {
         return gameStack.isEmpty();
     }
 
+    /**
+     * Gets the first {@link Board} element on the {@link #gameStack}.
+     *
+     * @return The latest {@link Board} object.
+     */
     public Board getGame() {
         return gameStack.peek();
     }
